@@ -1,0 +1,250 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["referentialActions"]
+}
+
+model User {
+  id                       Int               @id @default(autoincrement())
+  profileId                Int?              @unique
+  profile                  UserProfile?      @relation(fields: [profileId], references: [id])
+  azureId                  String?           @unique
+  email                    String            @unique
+  password                 String
+  userType                 String
+  isLocked                 Boolean           @default(true)
+  passwordResetToken       String?           @unique
+  passwordResetTokenExpire DateTime?
+  passwordChangedAt        DateTime?
+  guestVisitLogs           GuestVisit[]
+  guestVisitNotes          GuestVisitNote[]
+  memberVisitNotes         MemberVisitNote[]
+  clearedVisitors          VisitorStatus[]
+  createdAt                DateTime          @default(now())
+
+  @@map("users")
+}
+
+model UserProfile {
+  id           Int    @id @default(autoincrement())
+  user         User?
+  firstName    String
+  lastName     String
+  phoneNumber  String
+  organization String @default("KMC Community")
+
+  @@map("user_profiles")
+}
+
+model Visitor {
+  id                Int              @id @default(autoincrement())
+  guest             Boolean
+  firstName         String
+  lastName          String
+  email             String           @unique
+  phoneNumber       String
+  address           String
+  isClear           Boolean
+  clearance         Clearance[]
+  tempCheckList     TempCheckList[]
+  visitorStatusList VisitorStatus[]
+  travelLocations   TravelLocation[]
+  asGuest           GuestVisit[]
+  guestSurveys      GuestSurvey[]
+  asMember          MemberVisit[]
+  memberSurvey      MemberSurvey[]
+
+  @@map("visitors")
+}
+
+model VisitorStatus {
+  id            Int       @id @default(autoincrement())
+  visitorId     Int
+  visitor       Visitor   @relation(fields: [visitorId], references: [id])
+  status        String
+  isClearedById Int?
+  clearedBy     User?     @relation(fields: [isClearedById], references: [id])
+  clearedDate   DateTime?
+  createdAt     DateTime  @default(now())
+
+  @@map("visitor_status")
+}
+
+model TemperatureTag {
+  id            Int             @id @default(autoincrement())
+  tag           String
+  tempCheckList TempCheckList[]
+
+  @@map("temperature_tags")
+}
+
+model TempCheckList {
+  id          Int            @id @default(autoincrement())
+  temperature Float
+  tempTagId   Int
+  tag         TemperatureTag @relation(fields: [tempTagId], references: [id])
+  visitorId   Int
+  visitor     Visitor        @relation(fields: [visitorId], references: [id], onDelete: Cascade)
+  createdAt   DateTime       @default(now())
+
+  @@map("visitor_temp_check_list")
+}
+
+model GuestVisit {
+  id             Int              @id @default(autoincrement())
+  visitorId      Int
+  visitor        Visitor          @relation(fields: [visitorId], references: [id], onDelete: Cascade)
+  siteId         Int
+  floorId        Int
+  poc            String
+  pocEmail       String
+  isApprove      Boolean          @default(true)
+  approverId     Int
+  isApproveBy    User             @relation(fields: [approverId], references: [id])
+  healthTagId    Int
+  healthTag      HealthTag        @relation(fields: [healthTagId], references: [id])
+  guestVisitNote GuestVisitNote[]
+  dateTime       DateTime         @default(now())
+
+  @@map("guest_visits")
+}
+
+model GuestVisitNote {
+  id           Int        @id @default(autoincrement())
+  guestVisitId Int
+  guestVisit   GuestVisit @relation(fields: [guestVisitId], references: [id], onDelete: Cascade)
+  note         String
+  authorId     Int
+  author       User       @relation(fields: [authorId], references: [id])
+  createdAt    DateTime   @default(now())
+
+  @@map("guest_visit_notes")
+}
+
+model GuestSurvey {
+  id         Int      @id @default(autoincrement())
+  visitorId  Int
+  visitor    Visitor  @relation(fields: [visitorId], references: [id], onDelete: Cascade)
+  questionId Int
+  question   Question @relation(fields: [questionId], references: [id])
+  answer     String
+  createdAt  DateTime @default(now())
+
+  @@map("guest_serveys")
+}
+
+model MemberVisit {
+  id              Int               @id @default(autoincrement())
+  visitorId       Int
+  visitor         Visitor           @relation(fields: [visitorId], references: [id], onDelete: Cascade)
+  siteId          Int
+  floorId         Int
+  company         String
+  workTypeId      Int
+  workType        WorkType          @relation(fields: [workTypeId], references: [id])
+  leaveTypeId     Int
+  leaveType       LeaveType         @relation(fields: [leaveTypeId], references: [id])
+  healthTagId     Int
+  healthTag       HealthTag         @relation(fields: [healthTagId], references: [id])
+  memberVisitNote MemberVisitNote[]
+  dateTime        DateTime          @default(now())
+
+  @@map("member_visits")
+}
+
+model MemberVisitNote {
+  id            Int         @id @default(autoincrement())
+  memberVisitId Int
+  memberVisit   MemberVisit @relation(fields: [memberVisitId], references: [id], onDelete: Cascade)
+  note          String
+  authorId      Int
+  author        User        @relation(fields: [authorId], references: [id])
+  createdAt     DateTime    @default(now())
+
+  @@map("member_visit_notes")
+}
+
+model MemberSurvey {
+  id         Int      @id @default(autoincrement())
+  visitorId  Int
+  visitor    Visitor  @relation(fields: [visitorId], references: [id], onDelete: Cascade)
+  questionId Int
+  question   Question @relation(fields: [questionId], references: [id])
+  answer     String
+  createdAt  DateTime @default(now())
+
+  @@map("member_surveys")
+}
+
+model Clearance {
+  id           Int     @id @default(autoincrement())
+  visitorId    Int
+  visitor      Visitor @relation(fields: [visitorId], references: [id], onDelete: Cascade)
+  clearanceUrl String?
+  notes        String
+
+  @@map("clearance")
+}
+
+model WorkType {
+  id          Int           @id @default(autoincrement())
+  type        String        @unique
+  memberVisit MemberVisit[]
+
+  @@map("work_types")
+}
+
+model LeaveType {
+  id          Int           @id @default(autoincrement())
+  type        String        @unique
+  memberVisit MemberVisit[]
+
+  @@map("leave_types")
+}
+
+model HealthTag {
+  id           Int           @id @default(autoincrement())
+  tag          String
+  guestVisits  GuestVisit[]
+  memberVisits MemberVisit[]
+
+  @@map("health_tags")
+}
+
+model Question {
+  id            Int            @id @default(autoincrement())
+  question      String
+  multiSelect   Boolean        @default(false)
+  critical      Boolean        @default(true)
+  questionOrder Int
+  answers       Answer[]
+  guestSurveys  GuestSurvey[]
+  memberSurveys MemberSurvey[]
+
+  @@map("questions")
+}
+
+model Answer {
+  id        Int        @id @default(autoincrement())
+  answer    String     @unique
+  questions Question[]
+
+  @@map("answers")
+}
+
+model TravelLocation {
+  id        Int      @id @default(autoincrement())
+  city      String
+  visitorId Int
+  visitor   Visitor  @relation(fields: [visitorId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  @@map("travel_locations")
+}

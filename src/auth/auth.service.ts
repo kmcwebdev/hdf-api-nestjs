@@ -1,0 +1,137 @@
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+  UnauthorizedException,
+} from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
+import { JwtService } from '@nestjs/jwt';
+import { compare, hash } from 'bcrypt';
+import { LoginDTO } from 'src/common/dto/auth/login.dto';
+import { RegisterDTO } from 'src/common/dto/auth/register.dto';
+import { diffInMinutes } from 'src/common/utils/diff-in-minutes.util';
+import { PrismaClientService } from 'src/prisma-client/prisma-client.service';
+
+@Injectable()
+export class AuthService {
+  private refreshTokenKey: string;
+
+  constructor(
+    private prismaClientService: PrismaClientService,
+    private jwtService: JwtService,
+    private config: ConfigService<{ auth: { refreshTokenKey: string } }>,
+  ) {
+    this.refreshTokenKey = this.config.get<string>('auth.refreshTokenKey', {
+      infer: true,
+    });
+  }
+
+  async createJwtToken(id: number) {
+    return await this.jwtService.signAsync(
+      { id },
+      { secret: this.refreshTokenKey },
+    );
+  }
+
+  async signJwt(id: number) {
+    return await this.jwtService.signAsync({ id });
+  }
+
+  async login(data: LoginDTO) {
+    const { email, password } = data;
+
+    const user = await this.prismaClientService.user.findUnique({
+      where: { email },
+      select: {
+        id: true,
+        password: true,
+        userType: true,
+        isLocked: true,
+      },
+    });
+
+    if (user) {
+      if (user.isLocked) {
+        throw new UnauthorizedException('Your account is locked!');
+      }
+
+      if (await compare(password, user.password)) {
+        return user;
+      }
+    }
+
+    throw new UnauthorizedException('Invalid credentials!');
+  }
+
+  async register(data: RegisterDTO) {
+    const { email, password, userType } = data;
+
+    const hashedPassword = await hash(password, 10);
+
+    const result = await this.prismaClientService.user.create({
+      data: { email, password: hashedPassword, userType },
+      select: { id: true, email: true, userType: true },
+    });
+
+    return result;
+  }
+
+  async forgotPassword(email: string) {
+    const user = await this.prismaClientService.user.findUnique({
+      where: { email },
+    });
+
+    if (user) {
+      const fifteenMinutes = 15 * 60 * 1000;
+
+      await this.prismaClientService.user.update({
+        where: { id: user.id },
+        data: {
+          passwordResetToken: await this.createJwtToken(user.id),
+          passwordResetTokenExpire: new Date(Date.now() + fifteenMinutes),
+        },
+      });
+
+      return {
+        message:
+          'A password reset link has been sent to your registered email.',
+      };
+    }
+
+    throw new NotFoundException('No user found with this email!');
+  }
+
+  async checkPasswordResetToken(passwordResetToken: string) {
+    const user = await this.prismaClientService.user.findUnique({
+      where: { passwordResetToken },
+    });
+
+    if (user) {
+      if (diffInMinutes(user.passwordResetTokenExpire) <= 0) {
+        throw new BadRequestException('Password reset token already expired!');
+      }
+
+      return user;
+    }
+
+    throw new NotFoundException('Password reset token not found!');
+  }
+
+  async changePassword(passwordResetToken: string, password: string) {
+    const user = await this.checkPasswordResetToken(passwordResetToken);
+
+    const hashedPassword = await hash(password, 10);
+
+    await this.prismaClientService.user.update({
+      where: { id: user.id },
+      data: {
+        password: hashedPassword,
+        passwordChangedAt: new Date(Date.now() - 1000),
+        passwordResetToken: null,
+        passwordResetTokenExpire: null,
+      },
+    });
+
+    return { message: 'Password has been changed!' };
+  }
+}
