@@ -8,7 +8,6 @@ import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { compare, hash } from 'bcrypt';
 import { LoginDTO } from 'src/common/dto/auth/login.dto';
-import { RegisterDTO } from 'src/common/dto/auth/register.dto';
 import { diffInMinutes } from 'src/common/utils/diff-in-minutes.util';
 import { PrismaClientService } from 'src/prisma-client/prisma-client.service';
 
@@ -61,19 +60,6 @@ export class AuthService {
     }
 
     throw new UnauthorizedException('Invalid credentials!');
-  }
-
-  async register(data: RegisterDTO) {
-    const { email, password, userType } = data;
-
-    const hashedPassword = await hash(password, 10);
-
-    const result = await this.prismaClientService.user.create({
-      data: { email, password: hashedPassword, userType },
-      select: { id: true, email: true, userType: true },
-    });
-
-    return result;
   }
 
   async forgotPassword(email: string) {

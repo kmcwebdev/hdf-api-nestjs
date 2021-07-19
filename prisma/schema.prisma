@@ -51,6 +51,7 @@ model Visitor {
   email             String           @unique
   phoneNumber       String
   address           String
+  company           String
   isClear           Boolean
   clearance         Clearance[]
   tempCheckList     TempCheckList[]

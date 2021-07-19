@@ -13,7 +13,6 @@ import {
 } from '@nestjs/common';
 import {
   ApiBody,
-  ApiCreatedResponse,
   ApiOkResponse,
   ApiParam,
   ApiQuery,
@@ -24,7 +23,6 @@ import { cookie } from 'src/common/config/cokie.config';
 import { ChangePasswordDTO } from 'src/common/dto/auth/change-password.dto';
 import { ForgotPasswordDTO } from 'src/common/dto/auth/forgot-password.dto';
 import { LoginDTO } from 'src/common/dto/auth/login.dto';
-import { RegisterDTO } from 'src/common/dto/auth/register.dto';
 import { ResetTokenDTO } from 'src/common/dto/auth/reset-token.dto';
 import { AuthService } from './auth.service';
 import { JwtAuthGuard } from './guard/jwt.guard';
@@ -62,13 +60,6 @@ export class AuthController {
     res.clearCookie('accessToken');
 
     res.send({ message: 'sign out Successfully!' });
-  }
-
-  @Post('register')
-  @ApiBody({ type: RegisterDTO })
-  @ApiCreatedResponse({ description: 'Created' })
-  register(@Body() data: RegisterDTO) {
-    return this.authService.register(data);
   }
 
   @Get('login-state')
