@@ -15,7 +15,6 @@ model User {
   id                       Int               @id @default(autoincrement())
   profileId                Int?              @unique
   profile                  UserProfile?      @relation(fields: [profileId], references: [id])
-  azureId                  String?           @unique
   email                    String            @unique
   password                 String
   userType                 String

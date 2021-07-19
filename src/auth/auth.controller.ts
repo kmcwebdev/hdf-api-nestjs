@@ -47,6 +47,7 @@ export class AuthController {
 
     res.send({
       id: user.id,
+      email: user.email,
       userType: user.userType,
       isLocked: user.isLocked,
       token,

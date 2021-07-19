@@ -10,7 +10,7 @@ import {
 import { Match } from 'src/common/decorator/match.decorator';
 import { UserType } from 'src/common/enum/user-type.enum';
 
-export class RegisterDTO {
+export class ExternalRegisterDTO {
   @ApiProperty({ type: String })
   @IsEmail()
   readonly email: string;

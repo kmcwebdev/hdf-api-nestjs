@@ -8,6 +8,7 @@ import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { compare, hash } from 'bcrypt';
 import { LoginDTO } from 'src/common/dto/auth/login.dto';
+import { UserType } from 'src/common/enum/user-type.enum';
 import { diffInMinutes } from 'src/common/utils/diff-in-minutes.util';
 import { PrismaClientService } from 'src/prisma-client/prisma-client.service';
 
@@ -43,6 +44,7 @@ export class AuthService {
       where: { email },
       select: {
         id: true,
+        email: true,
         password: true,
         userType: true,
         isLocked: true,
@@ -69,6 +71,12 @@ export class AuthService {
 
     if (user) {
       const fifteenMinutes = 15 * 60 * 1000;
+
+      if (user.userType === UserType.Internal) {
+        throw new BadRequestException(
+          'Please change your office 365 password.',
+        );
+      }
 
       await this.prismaClientService.user.update({
         where: { id: user.id },
