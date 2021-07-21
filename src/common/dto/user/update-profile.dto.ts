@@ -6,22 +6,22 @@ export class UpdateProfileDTO {
   @ApiProperty()
   @IsNotEmpty()
   @IsString()
-  firstName: string;
+  readonly firstName: string;
 
   @ApiProperty()
   @IsNotEmpty()
   @IsString()
-  lastName: string;
+  readonly lastName: string;
 
   @ApiProperty()
   @IsNotEmpty()
   @IsString()
-  phoneNumber: string;
+  readonly phoneNumber: string;
 
   @ApiProperty()
   @IsNotEmpty()
   @IsString()
-  organization: string;
+  readonly organization: string;
 }
 
 export class PTUpdateProfileDTO extends PartialType(UpdateProfileDTO) {}

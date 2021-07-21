@@ -65,6 +65,12 @@ export class AuthService {
   }
 
   async forgotPassword(email: string) {
+    const domain = email.split('@').pop();
+
+    if (domain === 'kmc.solutions') {
+      throw new BadRequestException('Please reset your office 365 account');
+    }
+
     const user = await this.prismaClientService.user.findUnique({
       where: { email },
     });

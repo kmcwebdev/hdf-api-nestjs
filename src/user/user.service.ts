@@ -11,6 +11,7 @@ import { PTUpdateProfileDTO } from 'src/common/dto/user/update-profile.dto';
 import { UserType } from 'src/common/enum/user-type.enum';
 import { GraphUser } from 'src/common/interface/azure-graph/get-user.interface';
 import { PTUserQuery } from 'src/common/query/user.query';
+import { mailDomainIs } from 'src/common/utils/email-domain-check.util';
 import { hashPassword } from 'src/common/utils/hashed-password.util';
 import { paginate } from 'src/common/utils/paginate.util';
 import { PrismaClientService } from 'src/prisma-client/prisma-client.service';
@@ -49,9 +50,9 @@ export class UserService {
             lastName: { contains: lastName, mode: 'insensitive' },
             phoneNumber: { contains: phoneNumber, mode: 'insensitive' },
           },
-          createdAt: {
+          dateCreated: {
             gte: createdFrom ? new Date(createdFrom) : undefined,
-            lte: createdTo ? new Date(createdTo) : undefined,
+            lte: createdFrom ? new Date(createdTo) : undefined,
           },
         },
         select: {
@@ -60,7 +61,8 @@ export class UserService {
           userType: true,
           isLocked: true,
           profile: true,
-          createdAt: true,
+          dateCreated: true,
+          timeCreated: true,
         },
         orderBy: {
           id: 'desc',
@@ -76,7 +78,7 @@ export class UserService {
             lastName: { contains: lastName, mode: 'insensitive' },
             phoneNumber: { contains: phoneNumber, mode: 'insensitive' },
           },
-          createdAt: {
+          dateCreated: {
             gte: createdFrom ? new Date(createdFrom) : undefined,
             lte: createdTo ? new Date(createdTo) : undefined,
           },
@@ -103,9 +105,54 @@ export class UserService {
         userType: true,
         isLocked: true,
         profile: true,
-        createdAt: true,
+        dateCreated: true,
+        timeCreated: true,
       },
     });
+  }
+
+  async checkUserEmail(email: string) {
+    const userEmail = await this.prismaClientService.user.findUnique({
+      where: { email },
+    });
+
+    return userEmail;
+  }
+
+  async checkInternalUserDuplication(email: string) {
+    const checkDuplication = await this.checkUserEmail(email);
+
+    if (checkDuplication) {
+      throw new BadRequestException('User is already registered');
+    }
+
+    const internalUser = await firstValueFrom<GraphUser>(
+      this.azureGraphService.getEmailDetails(email),
+    );
+
+    if (!internalUser) {
+      throw new NotFoundException(`No user found with this email: ${email}`);
+    }
+
+    return internalUser;
+  }
+
+  async checkExternalUserDuplication(email: string) {
+    if (mailDomainIs(email, 'kmc.solutions')) {
+      throw new BadRequestException('This is an external user email');
+    }
+
+    const checkDuplication = await this.checkUserEmail(email);
+
+    if (checkDuplication) {
+      return {
+        isAvailable: false,
+      };
+    }
+
+    return {
+      isAvailable: true,
+    };
   }
 
   async updateProfile(data: { id: number; payload: PTUpdateProfileDTO }) {
@@ -117,37 +164,55 @@ export class UserService {
     });
   }
 
-  async registerInternalUser(data: InternalRegisterDTO) {
-    const { email } = data;
+  async lockUser(data: { lockUserId: number; lockedById: number }) {
+    const { lockUserId, lockedById } = data;
 
-    const checkDuplication = await this.prismaClientService.user.findUnique({
-      where: { email },
+    return await this.prismaClientService.user.update({
+      where: { id: lockUserId },
+      data: {
+        isLocked: true,
+        lockedLogs: { create: { lockedById, operation: 'Locked' } },
+      },
     });
+  }
 
-    if (checkDuplication) {
-      throw new BadRequestException('User is already registered');
-    }
+  async unlockUser(data: { lockUserId: number; lockedById: number }) {
+    const { lockUserId, lockedById } = data;
 
-    const graphApi = await firstValueFrom<GraphUser>(
-      this.azureGraphService.getEmailDetails(email),
-    );
+    return await this.prismaClientService.user.update({
+      where: { id: lockUserId },
+      data: {
+        isLocked: false,
+        lockedLogs: { create: { lockedById, operation: 'Unlocked' } },
+      },
+    });
+  }
 
-    if (!graphApi) {
-      throw new NotFoundException(`No user found with this email: ${email}`);
-    }
+  async registerInternalUser(data: {
+    userId: number;
+    payload: InternalRegisterDTO;
+  }) {
+    const { userId, payload } = data;
+    const { email } = payload;
 
-    const hashedPassword = await hashPassword(graphApi.id);
+    const internalUser = await this.checkInternalUserDuplication(email);
+
+    const hashedPassword = await hashPassword(internalUser.id);
 
     const result = await this.prismaClientService.user.create({
       data: {
         email,
         password: hashedPassword,
         userType: UserType.Internal,
+        emailConfirm: true,
         isLocked: false,
+        registeredBy: {
+          connect: { id: userId },
+        },
         profile: {
           create: {
-            firstName: graphApi.givenName,
-            lastName: graphApi.surName,
+            firstName: internalUser.givenName,
+            lastName: internalUser.surName,
           },
         },
       },
@@ -157,8 +222,12 @@ export class UserService {
     return result;
   }
 
-  async registerExternalUser(data: ExternalRegisterDTO) {
-    const { email, firstName, lastName, organization, password } = data;
+  async registerExternalUser(data: {
+    userId: number;
+    payload: ExternalRegisterDTO;
+  }) {
+    const { userId, payload } = data;
+    const { email, firstName, lastName, organization, password } = payload;
 
     const hashedPassword = await hashPassword(password);
 
@@ -167,6 +236,11 @@ export class UserService {
         email,
         password: hashedPassword,
         userType: UserType.External,
+        emailConfirm: false,
+        isLocked: false,
+        registeredBy: {
+          connect: { id: userId },
+        },
         profile: {
           create: {
             firstName,

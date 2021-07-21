@@ -9,6 +9,8 @@ import defaultEnv from './common/config/default.config';
 import erpEnv from './common/config/erp.config';
 import sendgridEnv from './common/config/sengrid.config';
 import { PrismaClientModule } from './prisma-client/prisma-client.module';
+import { QuestionModule } from './question/question.module';
+import { SiteModule } from './site/site.module';
 import { UserModule } from './user/user.module';
 import { VisitorModule } from './visitor/visitor.module';
 
@@ -28,9 +30,11 @@ import { VisitorModule } from './visitor/visitor.module';
     }),
     PrismaClientModule,
     AzureGraphApiModule,
+    QuestionModule,
     AuthModule,
     UserModule,
     VisitorModule,
+    SiteModule,
   ],
   // providers: [
   //   {
