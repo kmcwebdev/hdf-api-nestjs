@@ -26,18 +26,18 @@ model User {
   guestVisitNotes          GuestVisitNote[]
   memberVisitNotes         MemberVisitNote[]
   clearedVisitors          VisitorStatus[]
-  createdAt                DateTime          @default(now())
+  createdAt                DateTime          @default(now()) @db.Date
 
   @@map("users")
 }
 
 model UserProfile {
-  id           Int    @id @default(autoincrement())
+  id           Int     @id @default(autoincrement())
   user         User?
   firstName    String
   lastName     String
-  phoneNumber  String
-  organization String @default("KMC Community")
+  phoneNumber  String?
+  organization String  @default("KMC Community")
 
   @@map("user_profiles")
 }
@@ -71,8 +71,9 @@ model VisitorStatus {
   status        String
   isClearedById Int?
   clearedBy     User?     @relation(fields: [isClearedById], references: [id])
-  clearedDate   DateTime?
-  createdAt     DateTime  @default(now())
+  clearedDate   DateTime? @db.Date
+  date          DateTime  @default(now()) @db.Date
+  time          DateTime  @default(now()) @db.Time
 
   @@map("visitor_status")
 }
@@ -111,7 +112,8 @@ model GuestVisit {
   healthTagId    Int
   healthTag      HealthTag        @relation(fields: [healthTagId], references: [id])
   guestVisitNote GuestVisitNote[]
-  dateTime       DateTime         @default(now())
+  date           DateTime         @default(now()) @db.Date
+  time           DateTime         @default(now()) @db.Time
 
   @@map("guest_visits")
 }
@@ -154,7 +156,8 @@ model MemberVisit {
   healthTagId     Int
   healthTag       HealthTag         @relation(fields: [healthTagId], references: [id])
   memberVisitNote MemberVisitNote[]
-  dateTime        DateTime          @default(now())
+  date            DateTime          @default(now()) @db.Date
+  time            DateTime          @default(now()) @db.Time
 
   @@map("member_visits")
 }

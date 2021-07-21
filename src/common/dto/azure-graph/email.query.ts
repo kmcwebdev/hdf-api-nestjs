@@ -1,8 +1,8 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsEmail } from 'class-validator';
 
-export class InternalRegisterDTO {
-  @ApiProperty({ type: String })
+export class EmailQuery {
+  @ApiProperty()
   @IsEmail()
-  readonly email: string;
+  email: string;
 }
