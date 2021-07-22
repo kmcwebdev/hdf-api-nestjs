@@ -66,6 +66,6 @@ async function bootstrap() {
 
   prismaClientService.enableShutdownHooks(app);
 
-  await app.listen(8989);
+  await app.listen(process.env.PORT || 8080);
 }
 bootstrap();

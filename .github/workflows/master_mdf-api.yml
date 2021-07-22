@@ -45,9 +45,6 @@ jobs:
         with:
           name: node-app
 
-      - name: 'Unzip tar'
-        run: tar -xvf /home/runner/work/mdf-api/mdf-api/node-app.tar
-
       - name: 'Deploy to Azure Web App'
         id: deploy-to-webapp
         uses: azure/webapps-deploy@v2
@@ -56,3 +53,6 @@ jobs:
           slot-name: 'production'
           publish-profile: ${{ secrets.AzureAppService_PublishProfile_a4f1c35074d043ed98760f149fcc880f }}
           package: .
+
+      - name: 'Unzip tar'
+        run: tar -xvf /home/runner/work/mdf-api/mdf-api/node-app.tar
