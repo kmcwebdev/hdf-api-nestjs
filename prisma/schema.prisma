@@ -27,8 +27,7 @@ model User {
   passwordChangedAt        DateTime?
   emailConfirm             Boolean             @default(false)
   permissions              Permission[]
-  guestVisitNotes          GuestVisitNote[]
-  memberVisitNotes         MemberVisitNote[]
+  visitorNotes             VisitorNote[]
   clearedVisitors          VisitorStatus[]
   lockedLogs               UserLockStatusLog[] @relation("lockedLogToUser")
   lockedByUsers            UserLockStatusLog[] @relation("lockedUser")
@@ -75,7 +74,6 @@ model UserProfile {
 
 model Visitor {
   id                Int             @id @default(autoincrement())
-  guest             Boolean
   isBlocked         Boolean         @default(false)
   firstName         String
   lastName          String
@@ -86,8 +84,8 @@ model Visitor {
   clearance         Clearance[]
   tempCheckList     TempCheckList[]
   visitorStatusList VisitorStatus[]
-  asGuest           GuestVisit[]
-  asMember          MemberVisit[]
+  visitorNotes      VisitorNote[]
+  visits            Visit[]
   dateCreated       DateTime        @default(now()) @db.Date
   timeCreated       DateTime        @default(now()) @db.Timestamptz
 
@@ -98,6 +96,8 @@ model VisitorStatus {
   id            Int       @id @default(autoincrement())
   visitorId     Int
   visitor       Visitor   @relation(fields: [visitorId], references: [id], onDelete: Cascade)
+  visitId       Int?
+  visit         Visit?    @relation(fields: [visitId], references: [id])
   status        String
   isClear       Boolean
   isClearedById Int?
@@ -108,6 +108,19 @@ model VisitorStatus {
   timeCreated   DateTime  @default(now()) @db.Timestamptz
 
   @@map("visitor_status")
+}
+
+model VisitorNote {
+  id          Int      @id @default(autoincrement())
+  note        String
+  visitorId   Int
+  visitor     Visitor  @relation(fields: [visitorId], references: [id])
+  authorId    Int
+  author      User     @relation(fields: [authorId], references: [id])
+  dateCreated DateTime @default(now()) @db.Date
+  timeCreated DateTime @default(now()) @db.Timestamptz
+
+  @@map("visitor_notes")
 }
 
 model TemperatureTag {
@@ -131,95 +144,44 @@ model TempCheckList {
   @@map("visitor_temp_check_list")
 }
 
-model GuestVisit {
+model Visit {
   id               Int             @id @default(autoincrement())
+  guest            Boolean
   visitorId        Int
   visitor          Visitor         @relation(fields: [visitorId], references: [id], onDelete: Cascade)
+  visitorStatus    VisitorStatus?
   siteId           Int
   site             Site            @relation(fields: [siteId], references: [siteId])
   floorId          Int
   floor            Floor           @relation(fields: [floorId], references: [floorId])
-  poc              String
-  pocEmail         String
-  guestSurveys     GuestSurvey[]
+  workTypeId       Int?
+  workType         WorkType?       @relation(fields: [workTypeId], references: [id])
+  leaveTypeId      Int?
+  leaveType        LeaveType?      @relation(fields: [leaveTypeId], references: [id])
+  poc              String?
+  pocEmail         String?
+  surveys          Survey[]
   travelLocationId Int?
-  travelLocation   TravelLocation? @relation(fields: [travelLocationId], references: [id])
+  travelLocation   TravelLocation? @relation(fields: [travelLocationId], references: [id], onDelete: Cascade)
   healthTagId      Int
   healthTag        HealthTag       @relation(fields: [healthTagId], references: [id])
   dateCreated      DateTime        @default(now()) @db.Date
   timeCreated      DateTime        @default(now()) @db.Timestamptz
 
-  @@map("guest_visits")
+  @@map("visits")
 }
 
-model GuestVisitNote {
+model Survey {
   id          Int      @id @default(autoincrement())
-  note        String
-  authorId    Int
-  author      User     @relation(fields: [authorId], references: [id])
+  visitId     Int
+  visit       Visit    @relation(fields: [visitId], references: [id], onDelete: Cascade)
+  questionId  Int
+  question    Question @relation(fields: [questionId], references: [id])
+  answer      String
   dateCreated DateTime @default(now()) @db.Date
   timeCreated DateTime @default(now()) @db.Timestamptz
 
-  @@map("guest_visit_notes")
-}
-
-model GuestSurvey {
-  id           Int        @id @default(autoincrement())
-  guestVisitId Int
-  guestVisit   GuestVisit @relation(fields: [guestVisitId], references: [id], onDelete: Cascade)
-  questionId   Int
-  question     Question   @relation(fields: [questionId], references: [id])
-  answer       String
-  dateCreated  DateTime   @default(now()) @db.Date
-  timeCreated  DateTime   @default(now()) @db.Timestamptz
-
-  @@map("guest_surveys")
-}
-
-model MemberVisit {
-  id            Int            @id @default(autoincrement())
-  visitorId     Int
-  visitor       Visitor        @relation(fields: [visitorId], references: [id], onDelete: Cascade)
-  siteId        Int
-  site          Site           @relation(fields: [siteId], references: [siteId])
-  floorId       Int
-  floor         Floor          @relation(fields: [floorId], references: [floorId])
-  company       String
-  workTypeId    Int
-  workType      WorkType       @relation(fields: [workTypeId], references: [id])
-  leaveTypeId   Int?
-  leaveType     LeaveType?     @relation(fields: [leaveTypeId], references: [id])
-  memberSurveys MemberSurvey[]
-  healthTagId   Int
-  healthTag     HealthTag      @relation(fields: [healthTagId], references: [id])
-  dateCreated   DateTime       @default(now()) @db.Date
-  timeCreated   DateTime       @default(now()) @db.Timestamptz
-
-  @@map("member_visits")
-}
-
-model MemberVisitNote {
-  id          Int      @id @default(autoincrement())
-  note        String
-  authorId    Int
-  author      User     @relation(fields: [authorId], references: [id])
-  dateCreated DateTime @default(now()) @db.Date
-  timeCreated DateTime @default(now()) @db.Timestamptz
-
-  @@map("member_visit_notes")
-}
-
-model MemberSurvey {
-  id            Int         @id @default(autoincrement())
-  memberVisitId Int
-  memberVisit   MemberVisit @relation(fields: [memberVisitId], references: [id], onDelete: Cascade)
-  questionId    Int
-  question      Question    @relation(fields: [questionId], references: [id])
-  answer        String
-  dateCreated   DateTime    @default(now()) @db.Date
-  timeCreated   DateTime    @default(now()) @db.Timestamptz
-
-  @@map("member_surveys")
+  @@map("surveys")
 }
 
 model Clearance {
@@ -235,39 +197,37 @@ model Clearance {
 }
 
 model WorkType {
-  id          Int           @id @default(autoincrement())
-  type        String        @unique
-  memberVisit MemberVisit[]
+  id     Int     @id @default(autoincrement())
+  type   String  @unique
+  visits Visit[]
 
   @@map("work_types")
 }
 
 model LeaveType {
-  id          Int           @id @default(autoincrement())
-  type        String        @unique
-  memberVisit MemberVisit[]
+  id     Int     @id @default(autoincrement())
+  type   String  @unique
+  visits Visit[]
 
   @@map("leave_types")
 }
 
 model HealthTag {
-  id           Int           @id @default(autoincrement())
-  tag          String        @unique
-  guestVisits  GuestVisit[]
-  memberVisits MemberVisit[]
+  id     Int     @id @default(autoincrement())
+  tag    String  @unique
+  visits Visit[]
 
   @@map("health_tags")
 }
 
 model Question {
-  id            Int            @id @default(autoincrement())
+  id            Int      @id @default(autoincrement())
   question      String
-  multiSelect   Boolean        @default(false)
-  critical      Boolean        @default(true)
+  multiSelect   Boolean  @default(false)
+  critical      Boolean  @default(true)
   questionOrder Int
   answers       Answer[]
-  guestSurveys  GuestSurvey[]
-  memberSurveys MemberSurvey[]
+  surveys       Survey[]
 
   @@map("questions")
 }
@@ -281,31 +241,29 @@ model Answer {
 }
 
 model TravelLocation {
-  id          Int         @id @default(autoincrement())
+  id          Int      @id @default(autoincrement())
   city        String
-  guestVisit  GuestVisit?
-  dateCreated DateTime    @default(now()) @db.Date
-  timeCreated DateTime    @default(now()) @db.Timestamptz
+  visit       Visit?
+  dateCreated DateTime @default(now()) @db.Date
+  timeCreated DateTime @default(now()) @db.Timestamptz
 
   @@map("travel_locations")
 }
 
 model Site {
-  siteId       Int           @id
-  siteName     String        @unique
-  floors       Floor[]
-  guestVisits  GuestVisit[]
-  memberVisits MemberVisit[]
+  siteId   Int     @id
+  siteName String  @unique
+  floors   Floor[]
+  Visits   Visit[]
 
   @@map("sites")
 }
 
 model Floor {
-  floorId      Int           @id
-  floor        String
-  sites        Site[]
-  guestVisits  GuestVisit[]
-  memberVisits MemberVisit[]
+  floorId Int     @id
+  floor   String
+  sites   Site[]
+  visits  Visit[]
 
   @@map("floors")
 }

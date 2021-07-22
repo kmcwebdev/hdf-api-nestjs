@@ -49,7 +49,7 @@ export class GuestService {
       );
     }
 
-    const duplicateVisit = await this.prismaClientService.guestVisit.findFirst({
+    const duplicateVisit = await this.prismaClientService.visit.findFirst({
       where: {
         AND: [
           {
@@ -65,6 +65,41 @@ export class GuestService {
       },
       select: {
         id: true,
+        guest: true,
+        visitor: {
+          select: {
+            id: true,
+            firstName: true,
+            lastName: true,
+            email: true,
+            address: true,
+            company: true,
+          },
+        },
+        visitorStatus: {
+          select: {
+            id: true,
+            status: true,
+            isClear: true,
+            clearedBy: {
+              select: {
+                id: true,
+                email: true,
+                profile: {
+                  select: {
+                    firstName: true,
+                    lastName: true,
+                    phoneNumber: true,
+                  },
+                },
+              },
+            },
+            dateCleared: true,
+            timeCleared: true,
+            dateCreated: true,
+            timeCreated: true,
+          },
+        },
         poc: true,
         pocEmail: true,
         travelLocation: true,
@@ -93,7 +128,6 @@ export class GuestService {
       const createdGuestVisitor = await this.prismaClientService.visitor.create(
         {
           data: {
-            guest: true,
             firstName,
             lastName,
             email,
@@ -118,8 +152,9 @@ export class GuestService {
       where: { id: allTrue ? 2 : 1 },
     });
 
-    const visit = await this.prismaClientService.guestVisit.create({
+    const visit = await this.prismaClientService.visit.create({
       data: {
+        guest: true,
         visitor: { connect: { id: guest.id } },
         site: { connect: { siteId } },
         floor: { connect: { floorId } },
@@ -131,14 +166,14 @@ export class GuestService {
 
     if (city) {
       await this.prismaClientService.travelLocation.create({
-        data: { city, guestVisit: { connect: { id: visit.id } } },
+        data: { city, visit: { connect: { id: visit.id } } },
       });
     }
 
     questions.forEach(async (data) => {
-      await this.prismaClientService.guestSurvey.create({
+      await this.prismaClientService.survey.create({
         data: {
-          guestVisit: { connect: { id: visit.id } },
+          visit: { connect: { id: visit.id } },
           question: { connect: { id: data.questionId } },
           answer: data.answer,
         },
@@ -148,15 +183,51 @@ export class GuestService {
     await this.prismaClientService.visitorStatus.create({
       data: {
         visitor: { connect: { id: guest.id } },
+        visit: { connect: { id: visit.id } },
         status: allTrue ? 'Denied' : 'Pending for approval',
         isClear: allTrue ? false : true,
       },
     });
 
-    return await this.prismaClientService.guestVisit.findUnique({
+    return await this.prismaClientService.visit.findUnique({
       where: { id: visit.id },
       select: {
         id: true,
+        guest: true,
+        visitor: {
+          select: {
+            id: true,
+            firstName: true,
+            lastName: true,
+            email: true,
+            address: true,
+            company: true,
+          },
+        },
+        visitorStatus: {
+          select: {
+            id: true,
+            status: true,
+            isClear: true,
+            clearedBy: {
+              select: {
+                id: true,
+                email: true,
+                profile: {
+                  select: {
+                    firstName: true,
+                    lastName: true,
+                    phoneNumber: true,
+                  },
+                },
+              },
+            },
+            dateCleared: true,
+            timeCleared: true,
+            dateCreated: true,
+            timeCreated: true,
+          },
+        },
         poc: true,
         pocEmail: true,
         travelLocation: true,
