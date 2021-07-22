@@ -1,8 +1,12 @@
 FROM node:14.17.3-alpine3.12 AS development
 
+RUN addgroup app && adduser -S -G app app
+
+USER app
+
 WORKDIR /usr/src/app
 
-COPY package*.json ./
+COPY package*.json yarn.lock ./
 
 RUN yarn install --only=development
 
@@ -15,9 +19,13 @@ FROM node:14.17.3-alpine3.12 as production
 ARG NODE_ENV=production
 ENV NODE_ENV=${NODE_ENV}
 
+RUN addgroup app && adduser -S -G app app
+
+USER app
+
 WORKDIR /usr/src/app
 
-COPY package*.json ./
+COPY package*.json yarn.lock ./
 
 RUN yarn install --only=production
 

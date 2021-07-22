@@ -11,9 +11,9 @@ import { SiteService } from './site.service';
     HttpModule.registerAsync({
       imports: [ConfigModule],
       useFactory: async (
-        configService: ConfigService<{ erp: { baseUrl: string } }>,
+        config: ConfigService<{ erp: { baseUrl: string } }>,
       ) => ({
-        baseURL: configService.get<string>('erp.baseUrl', { infer: true }),
+        baseURL: config.get<string>('erp.baseUrl', { infer: true }),
       }),
       inject: [ConfigService],
     }),

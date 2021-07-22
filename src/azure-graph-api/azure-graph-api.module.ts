@@ -8,10 +8,12 @@ import { AzureGraphApiService } from './azure-graph-api.service';
   imports: [
     HttpModule.registerAsync({
       imports: [ConfigModule],
-      useFactory: async (config: ConfigService) => ({
-        baseURL: config.get<string>('erp.baseUrl'),
+      useFactory: async (
+        config: ConfigService<{ erp: { baseUrl: string; apiKey: string } }>,
+      ) => ({
+        baseURL: config.get<string>('erp.baseUrl', { infer: true }),
         params: {
-          apiKey: config.get<string>('erp.apiKey'),
+          apiKey: config.get<string>('erp.apiKey', { infer: true }),
         },
       }),
       inject: [ConfigService],

@@ -8,11 +8,13 @@ import authEnv from './common/config/auth.config';
 import defaultEnv from './common/config/default.config';
 import erpEnv from './common/config/erp.config';
 import sendgridEnv from './common/config/sengrid.config';
+import { EventModule } from './event/event.module';
 import { PrismaClientModule } from './prisma-client/prisma-client.module';
 import { QuestionModule } from './question/question.module';
 import { SiteModule } from './site/site.module';
 import { UserModule } from './user/user.module';
 import { VisitorModule } from './visitor/visitor.module';
+import { FileModule } from './file/file.module';
 
 @Module({
   imports: [
@@ -34,7 +36,9 @@ import { VisitorModule } from './visitor/visitor.module';
     AuthModule,
     UserModule,
     VisitorModule,
+    EventModule,
     SiteModule,
+    FileModule,
   ],
   // providers: [
   //   {

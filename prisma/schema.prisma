@@ -3,7 +3,7 @@
 
 datasource db {
   provider = "postgresql"
-  url      = env("CUSTOMCONNSTR_DATABASE_URL")
+  url      = env("DATABASE_URL")
 }
 
 generator client {
@@ -250,11 +250,29 @@ model TravelLocation {
   @@map("travel_locations")
 }
 
+model Event {
+  id            Int      @id @default(autoincrement())
+  name          String
+  imageUrl      String
+  dateFrom      DateTime @db.Date
+  dateTo        DateTime @db.Date
+  time          DateTime @db.Timestamptz
+  siteId        Int
+  site          Site     @relation(fields: [siteId], references: [siteId])
+  floorId       Int
+  floor         Floor    @relation(fields: [floorId], references: [floorId])
+  contactPerson String
+  contactEmail  String
+
+  @@map("events")
+}
+
 model Site {
   siteId   Int     @id
   siteName String  @unique
   floors   Floor[]
   Visits   Visit[]
+  events   Event[]
 
   @@map("sites")
 }
@@ -264,6 +282,7 @@ model Floor {
   floor   String
   sites   Site[]
   visits  Visit[]
+  events  Event[]
 
   @@map("floors")
 }
