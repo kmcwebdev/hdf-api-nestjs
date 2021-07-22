@@ -23,11 +23,6 @@ jobs:
           yarn install
           yarn build
 
-      - name: prisma deploy, generate
-        run: |
-          yarn prisma migrate deploy
-          yarn prisma generate
-
       - name: 'Tar files'
         run: tar -cvf node-app.tar .
 
@@ -55,6 +50,11 @@ jobs:
 
       - name: 'Check file'
         run: cd /home/runner/work/mdf-api/mdf-api && ls
+
+      - name: prisma deploy, generate
+        run: |
+          yarn prisma migrate deploy
+          yarn prisma generate
 
       - name: 'Deploy to Azure Web App'
         id: deploy-to-webapp
