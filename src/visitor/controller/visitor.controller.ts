@@ -21,7 +21,10 @@ export class VisitorController {
   @ApiQuery({ type: EmailQuery })
   @ApiOkResponse({ description: 'Success' })
   checkLastVisitorVisitStatus(@Query() { email }: EmailQuery) {
-    return this.visitorService.checkLastVisitorVisitStatus(email);
+    return this.visitorService.checkLastVisitorVisitStatus({
+      email,
+      modeOfUse: 'Check',
+    });
   }
 
   @Patch('clear-visitor')

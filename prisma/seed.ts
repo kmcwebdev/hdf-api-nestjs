@@ -3,6 +3,7 @@ import { hash } from 'bcrypt';
 import answers from './data/answers';
 import healthTags from './data/health-tags';
 import leaveTypes from './data/leave-types';
+import permissions from './data/permissions';
 import questions from './data/questions';
 import user from './data/user';
 import workTypes from './data/work-types';
@@ -13,6 +14,7 @@ export async function seed() {
   const hashedPassword = await hash(user.password, 10);
 
   const transaction = await prismaClient.$transaction([
+    prismaClient.permission.createMany({ data: permissions }),
     prismaClient.user.create({
       data: {
         email: user.email,

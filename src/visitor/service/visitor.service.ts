@@ -1,4 +1,8 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { PrismaClientService } from 'src/prisma-client/prisma-client.service';
 
 @Injectable()
@@ -10,15 +14,24 @@ export class VisitorService {
       where: { email },
     });
 
-    if (result.isBlocked) {
+    if (result?.isBlocked) {
       throw new BadRequestException('You are blocked by the admin');
     }
 
     return result;
   }
 
-  async checkLastVisitorVisitStatus(email: string) {
-    const result = await this.prismaClientService.visitorStatus.findFirst({
+  /**
+   * @param {string} email visitor email
+   * @param {string} modeOfUse 'Create' if will use to create visit or 'Check' for checking
+   */
+  async checkLastVisitorVisitStatus(data: {
+    email: string;
+    modeOfUse: 'Create' | 'Check';
+  }) {
+    const { email, modeOfUse } = data;
+
+    const lastVisit = await this.prismaClientService.visitorStatus.findFirst({
       where: { visitor: { email: { equals: email, mode: 'insensitive' } } },
       select: {
         id: true,
@@ -54,7 +67,11 @@ export class VisitorService {
       orderBy: { id: 'desc' },
     });
 
-    return result;
+    if (!lastVisit && modeOfUse === 'Check') {
+      throw new NotFoundException('No last visit found');
+    }
+
+    return lastVisit;
   }
 
   async updateVisitor() {
@@ -64,7 +81,10 @@ export class VisitorService {
   async clearVisitor(data: { userId: number; email: string }) {
     const { userId, email } = data;
 
-    const lastVisit = await this.checkLastVisitorVisitStatus(email);
+    const lastVisit = await this.checkLastVisitorVisitStatus({
+      email,
+      modeOfUse: 'Check',
+    });
 
     if (lastVisit.isClear && lastVisit.clearedBy) {
       return lastVisit;

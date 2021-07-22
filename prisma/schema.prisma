@@ -12,55 +12,39 @@ generator client {
 }
 
 model User {
-  id                         Int                 @id @default(autoincrement())
-  profileId                  Int?                @unique
-  profile                    UserProfile?        @relation(fields: [profileId], references: [id])
-  email                      String              @unique
-  password                   String
-  userType                   String
-  isLocked                   Boolean             @default(true)
-  registeredById             Int?
-  registeredBy               User?               @relation("EncoderToUser", fields: [registeredById], references: [id])
-  listOfEncodedAccounts      User[]              @relation("EncoderToUser")
-  passwordResetToken         String?             @unique
-  passwordResetTokenExpire   DateTime?
-  passwordChangedAt          DateTime?
-  emailConfirm               Boolean             @default(false)
-  guestVisitNotes            GuestVisitNote[]
-  memberVisitNotes           MemberVisitNote[]
-  clearedVisitors            VisitorStatus[]
-  userPermissionLogs         UserPermissionLog[] @relation("PermissionToUser")
-  providerUserPermissionLogs UserPermissionLog[] @relation("ProviderToUserPermission")
-  lockedLogs                 UserLockStatusLog[] @relation("lockedLogToUser")
-  lockedByUsers              UserLockStatusLog[] @relation("lockedUser")
-  dateCreated                DateTime            @default(now()) @db.Date
-  timeCreated                DateTime            @default(now()) @db.Time
+  id                       Int                 @id @default(autoincrement())
+  profileId                Int?                @unique
+  profile                  UserProfile?        @relation(fields: [profileId], references: [id])
+  email                    String              @unique
+  password                 String
+  userType                 String
+  isLocked                 Boolean             @default(true)
+  registeredById           Int?
+  registeredBy             User?               @relation("EncoderToUser", fields: [registeredById], references: [id])
+  listOfEncodedAccounts    User[]              @relation("EncoderToUser")
+  passwordResetToken       String?             @unique
+  passwordResetTokenExpire DateTime?
+  passwordChangedAt        DateTime?
+  emailConfirm             Boolean             @default(false)
+  permissions              Permission[]
+  guestVisitNotes          GuestVisitNote[]
+  memberVisitNotes         MemberVisitNote[]
+  clearedVisitors          VisitorStatus[]
+  lockedLogs               UserLockStatusLog[] @relation("lockedLogToUser")
+  lockedByUsers            UserLockStatusLog[] @relation("lockedUser")
+  dateCreated              DateTime            @default(now()) @db.Date
+  timeCreated              DateTime            @default(now()) @db.Time
 
 
   @@map("users")
 }
 
 model Permission {
-  id                 Int                 @id @default(autoincrement())
-  type               String              @unique
-  userPermissionLogs UserPermissionLog[]
+  id    Int    @id @default(autoincrement())
+  type  String @unique
+  users User[]
 
   @@map("permissions")
-}
-
-model UserPermissionLog {
-  userId       Int
-  user         User       @relation("PermissionToUser", fields: [userId], references: [id])
-  providerId   Int
-  User         User       @relation("ProviderToUserPermission", fields: [providerId], references: [id])
-  permissionId Int
-  permission   Permission @relation(fields: [permissionId], references: [id])
-  action       String
-  date         DateTime   @default(now()) @db.Date
-  time         DateTime   @default(now()) @db.Timestamptz
-
-  @@id([userId, providerId])
-  @@map("user_permission_logs")
 }
 
 model UserLockStatusLog {
@@ -90,25 +74,22 @@ model UserProfile {
 }
 
 model Visitor {
-  id                Int              @id @default(autoincrement())
+  id                Int             @id @default(autoincrement())
   guest             Boolean
-  isBlocked         Boolean          @default(false)
+  isBlocked         Boolean         @default(false)
   firstName         String
   lastName          String
-  email             String           @unique
+  email             String          @unique
   phoneNumber       String
   address           String
   company           String
   clearance         Clearance[]
   tempCheckList     TempCheckList[]
   visitorStatusList VisitorStatus[]
-  travelLocations   TravelLocation[]
   asGuest           GuestVisit[]
-  guestSurveys      GuestSurvey[]
   asMember          MemberVisit[]
-  memberSurvey      MemberSurvey[]
-  dateCreated       DateTime         @default(now()) @db.Date
-  timeCreated       DateTime         @default(now()) @db.Timestamptz
+  dateCreated       DateTime        @default(now()) @db.Date
+  timeCreated       DateTime        @default(now()) @db.Timestamptz
 
   @@map("visitors")
 }
@@ -151,94 +132,92 @@ model TempCheckList {
 }
 
 model GuestVisit {
-  id             Int              @id @default(autoincrement())
-  visitorId      Int
-  visitor        Visitor          @relation(fields: [visitorId], references: [id], onDelete: Cascade)
-  siteId         Int
-  site           Site             @relation(fields: [siteId], references: [siteId])
-  floorId        Int
-  floor          Floor            @relation(fields: [floorId], references: [floorId])
-  poc            String
-  pocEmail       String
-  healthTagId    Int
-  healthTag      HealthTag        @relation(fields: [healthTagId], references: [id])
-  guestVisitNote GuestVisitNote[]
-  dateCreated    DateTime         @default(now()) @db.Date
-  timeCreated    DateTime         @default(now()) @db.Timestamptz
+  id               Int             @id @default(autoincrement())
+  visitorId        Int
+  visitor          Visitor         @relation(fields: [visitorId], references: [id], onDelete: Cascade)
+  siteId           Int
+  site             Site            @relation(fields: [siteId], references: [siteId])
+  floorId          Int
+  floor            Floor           @relation(fields: [floorId], references: [floorId])
+  poc              String
+  pocEmail         String
+  guestSurveys     GuestSurvey[]
+  travelLocationId Int?
+  travelLocation   TravelLocation? @relation(fields: [travelLocationId], references: [id])
+  healthTagId      Int
+  healthTag        HealthTag       @relation(fields: [healthTagId], references: [id])
+  dateCreated      DateTime        @default(now()) @db.Date
+  timeCreated      DateTime        @default(now()) @db.Timestamptz
 
   @@map("guest_visits")
 }
 
 model GuestVisitNote {
-  id           Int        @id @default(autoincrement())
-  guestVisitId Int
-  guestVisit   GuestVisit @relation(fields: [guestVisitId], references: [id], onDelete: Cascade)
-  note         String
-  authorId     Int
-  author       User       @relation(fields: [authorId], references: [id])
-  dateCreated  DateTime   @default(now()) @db.Date
-  timeCreated  DateTime   @default(now()) @db.Timestamptz
+  id          Int      @id @default(autoincrement())
+  note        String
+  authorId    Int
+  author      User     @relation(fields: [authorId], references: [id])
+  dateCreated DateTime @default(now()) @db.Date
+  timeCreated DateTime @default(now()) @db.Timestamptz
 
   @@map("guest_visit_notes")
 }
 
 model GuestSurvey {
-  id          Int      @id @default(autoincrement())
-  visitorId   Int
-  visitor     Visitor  @relation(fields: [visitorId], references: [id], onDelete: Cascade)
-  questionId  Int
-  question    Question @relation(fields: [questionId], references: [id])
-  answer      String
-  dateCreated DateTime @default(now()) @db.Date
-  timeCreated DateTime @default(now()) @db.Timestamptz
+  id           Int        @id @default(autoincrement())
+  guestVisitId Int
+  guestVisit   GuestVisit @relation(fields: [guestVisitId], references: [id], onDelete: Cascade)
+  questionId   Int
+  question     Question   @relation(fields: [questionId], references: [id])
+  answer       String
+  dateCreated  DateTime   @default(now()) @db.Date
+  timeCreated  DateTime   @default(now()) @db.Timestamptz
 
-  @@map("guest_serveys")
+  @@map("guest_surveys")
 }
 
 model MemberVisit {
-  id              Int               @id @default(autoincrement())
-  visitorId       Int
-  visitor         Visitor           @relation(fields: [visitorId], references: [id], onDelete: Cascade)
-  siteId          Int
-  site            Site              @relation(fields: [siteId], references: [siteId])
-  floorId         Int
-  floor           Floor             @relation(fields: [floorId], references: [floorId])
-  company         String
-  workTypeId      Int
-  workType        WorkType          @relation(fields: [workTypeId], references: [id])
-  leaveTypeId     Int?
-  leaveType       LeaveType?        @relation(fields: [leaveTypeId], references: [id])
-  healthTagId     Int
-  healthTag       HealthTag         @relation(fields: [healthTagId], references: [id])
-  memberVisitNote MemberVisitNote[]
-  dateCreated     DateTime          @default(now()) @db.Date
-  timeCreated     DateTime          @default(now()) @db.Timestamptz
+  id            Int            @id @default(autoincrement())
+  visitorId     Int
+  visitor       Visitor        @relation(fields: [visitorId], references: [id], onDelete: Cascade)
+  siteId        Int
+  site          Site           @relation(fields: [siteId], references: [siteId])
+  floorId       Int
+  floor         Floor          @relation(fields: [floorId], references: [floorId])
+  company       String
+  workTypeId    Int
+  workType      WorkType       @relation(fields: [workTypeId], references: [id])
+  leaveTypeId   Int?
+  leaveType     LeaveType?     @relation(fields: [leaveTypeId], references: [id])
+  memberSurveys MemberSurvey[]
+  healthTagId   Int
+  healthTag     HealthTag      @relation(fields: [healthTagId], references: [id])
+  dateCreated   DateTime       @default(now()) @db.Date
+  timeCreated   DateTime       @default(now()) @db.Timestamptz
 
   @@map("member_visits")
 }
 
 model MemberVisitNote {
-  id            Int         @id @default(autoincrement())
-  memberVisitId Int
-  memberVisit   MemberVisit @relation(fields: [memberVisitId], references: [id], onDelete: Cascade)
-  note          String
-  authorId      Int
-  author        User        @relation(fields: [authorId], references: [id])
-  dateCreated   DateTime    @default(now()) @db.Date
-  timeCreated   DateTime    @default(now()) @db.Timestamptz
+  id          Int      @id @default(autoincrement())
+  note        String
+  authorId    Int
+  author      User     @relation(fields: [authorId], references: [id])
+  dateCreated DateTime @default(now()) @db.Date
+  timeCreated DateTime @default(now()) @db.Timestamptz
 
   @@map("member_visit_notes")
 }
 
 model MemberSurvey {
-  id          Int      @id @default(autoincrement())
-  visitorId   Int
-  visitor     Visitor  @relation(fields: [visitorId], references: [id], onDelete: Cascade)
-  questionId  Int
-  question    Question @relation(fields: [questionId], references: [id])
-  answer      String
-  dateCreated DateTime @default(now()) @db.Date
-  timeCreated DateTime @default(now()) @db.Timestamptz
+  id            Int         @id @default(autoincrement())
+  memberVisitId Int
+  memberVisit   MemberVisit @relation(fields: [memberVisitId], references: [id], onDelete: Cascade)
+  questionId    Int
+  question      Question    @relation(fields: [questionId], references: [id])
+  answer        String
+  dateCreated   DateTime    @default(now()) @db.Date
+  timeCreated   DateTime    @default(now()) @db.Timestamptz
 
   @@map("member_surveys")
 }
@@ -302,12 +281,11 @@ model Answer {
 }
 
 model TravelLocation {
-  id          Int      @id @default(autoincrement())
+  id          Int         @id @default(autoincrement())
   city        String
-  visitorId   Int
-  visitor     Visitor  @relation(fields: [visitorId], references: [id], onDelete: Cascade)
-  dateCreated DateTime @default(now()) @db.Date
-  timeCreated DateTime @default(now()) @db.Timestamptz
+  guestVisit  GuestVisit?
+  dateCreated DateTime    @default(now()) @db.Date
+  timeCreated DateTime    @default(now()) @db.Timestamptz
 
   @@map("travel_locations")
 }

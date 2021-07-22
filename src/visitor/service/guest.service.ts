@@ -38,7 +38,10 @@ export class GuestService {
     }
 
     const oldVisitStatus =
-      await this.visitorService.checkLastVisitorVisitStatus(email);
+      await this.visitorService.checkLastVisitorVisitStatus({
+        email,
+        modeOfUse: 'Create',
+      });
 
     if (oldVisitStatus?.isClear === false) {
       throw new BadRequestException(
@@ -64,6 +67,7 @@ export class GuestService {
         id: true,
         poc: true,
         pocEmail: true,
+        travelLocation: true,
         site: true,
         floor: true,
         healthTag: true,
@@ -103,22 +107,6 @@ export class GuestService {
       guest = createdGuestVisitor;
     }
 
-    if (city) {
-      await this.prismaClientService.travelLocation.create({
-        data: { city, visitor: { connect: { id: guest.id } } },
-      });
-    }
-
-    questions.forEach(async (data) => {
-      await this.prismaClientService.guestSurvey.create({
-        data: {
-          visitor: { connect: { id: guest.id } },
-          question: { connect: { id: data.questionId } },
-          answer: data.answer,
-        },
-      });
-    });
-
     const allTrue = questions
       .map(
         (data) =>
@@ -126,7 +114,6 @@ export class GuestService {
           data.answer.includes('No'),
       )
       .filter((answer) => answer === false).length;
-
     const healthTag = await this.prismaClientService.healthTag.findUnique({
       where: { id: allTrue ? 2 : 1 },
     });
@@ -140,16 +127,22 @@ export class GuestService {
         pocEmail,
         healthTag: { connect: { id: healthTag.id } },
       },
-      select: {
-        id: true,
-        poc: true,
-        pocEmail: true,
-        site: true,
-        floor: true,
-        healthTag: true,
-        dateCreated: true,
-        timeCreated: true,
-      },
+    });
+
+    if (city) {
+      await this.prismaClientService.travelLocation.create({
+        data: { city, guestVisit: { connect: { id: visit.id } } },
+      });
+    }
+
+    questions.forEach(async (data) => {
+      await this.prismaClientService.guestSurvey.create({
+        data: {
+          guestVisit: { connect: { id: visit.id } },
+          question: { connect: { id: data.questionId } },
+          answer: data.answer,
+        },
+      });
     });
 
     await this.prismaClientService.visitorStatus.create({
@@ -160,6 +153,19 @@ export class GuestService {
       },
     });
 
-    return visit;
+    return await this.prismaClientService.guestVisit.findUnique({
+      where: { id: visit.id },
+      select: {
+        id: true,
+        poc: true,
+        pocEmail: true,
+        travelLocation: true,
+        site: true,
+        floor: true,
+        healthTag: true,
+        dateCreated: true,
+        timeCreated: true,
+      },
+    });
   }
 }
