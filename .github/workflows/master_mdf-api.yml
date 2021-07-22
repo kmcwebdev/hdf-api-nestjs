@@ -23,6 +23,11 @@ jobs:
           yarn install
           yarn build
 
+      - name: prisma deploy, generate
+        run: |
+          yarn prisma migrate deploy
+          yarn prisma generate
+
       - name: 'Tar files'
         run: tar -cvf node-app.tar .
 
