@@ -40,6 +40,9 @@ jobs:
       url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}
 
     steps:
+      - name: 'Delete old tar'
+        run: rm /home/runner/work/mdf-api/mdf-api/node-app.tar
+
       - name: Download artifact from build job
         uses: actions/download-artifact@v2
         with:
@@ -50,9 +53,6 @@ jobs:
 
       - name: 'Check file'
         run: cd /home/runner/work/mdf-api/mdf-api && ls
-
-      - name: 'Delete old tar'
-        run: rm node-app.tar
 
       - name: 'Deploy to Azure Web App'
         id: deploy-to-webapp
