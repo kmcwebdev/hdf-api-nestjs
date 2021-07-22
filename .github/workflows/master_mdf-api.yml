@@ -46,7 +46,10 @@ jobs:
           name: node-app
 
       - name: 'Unzip tar'
-        run: tar -zxvf /home/runner/work/mdf-api/mdf-api/node-app.tar
+        run: tar -xvf /home/runner/work/mdf-api/mdf-api/node-app.tar
+
+      - name: 'Check file'
+        run: cd /home/runner/work/mdf-api/mdf-api && ls
 
       - name: 'Delete old tar'
         run: rm node-app.tar
