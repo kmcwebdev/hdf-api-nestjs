@@ -46,7 +46,10 @@ jobs:
           name: node-app
 
       - name: 'Unzip tar'
-        run: tar -zxvf node-app.tar
+        run: tar -zxvf /home/runner/work/mdf-api/mdf-api/node-app.tar
+
+      - name: 'Delete old tar'
+        run: rm node-app.tar
 
       - name: 'Deploy to Azure Web App'
         id: deploy-to-webapp
