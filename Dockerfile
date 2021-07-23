@@ -4,7 +4,7 @@ RUN addgroup app && adduser -S -G app app
 
 USER app
 
-WORKDIR /usr/src/app
+WORKDIR /app
 
 COPY package*.json yarn.lock ./
 
@@ -23,7 +23,7 @@ RUN addgroup app && adduser -S -G app app
 
 USER app
 
-WORKDIR /usr/src/app
+WORKDIR /app
 
 COPY package*.json yarn.lock ./
 
@@ -31,6 +31,6 @@ RUN yarn install --only=production
 
 COPY . .
 
-COPY --from=development /usr/src/app/dist ./dist
+COPY --from=development /app/dist ./dist
 
 CMD ["node", "dist/main"]

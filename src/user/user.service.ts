@@ -31,6 +31,7 @@ export class UserService {
       firstName,
       lastName,
       phoneNumber,
+      organization,
       createdFrom,
       createdTo,
     } = query;
@@ -49,6 +50,7 @@ export class UserService {
             firstName: { contains: firstName, mode: 'insensitive' },
             lastName: { contains: lastName, mode: 'insensitive' },
             phoneNumber: { contains: phoneNumber, mode: 'insensitive' },
+            organization: { contains: organization, mode: 'insensitive' },
           },
           dateCreated: {
             gte: createdFrom ? new Date(createdFrom) : undefined,
@@ -77,6 +79,7 @@ export class UserService {
             firstName: { contains: firstName, mode: 'insensitive' },
             lastName: { contains: lastName, mode: 'insensitive' },
             phoneNumber: { contains: phoneNumber, mode: 'insensitive' },
+            organization: { contains: organization, mode: 'insensitive' },
           },
           dateCreated: {
             gte: createdFrom ? new Date(createdFrom) : undefined,

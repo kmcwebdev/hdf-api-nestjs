@@ -38,7 +38,7 @@ export class FileController {
     @UploadedFile()
     file: UploadedFileMetadata,
   ) {
-    const storageUrl = await this.fileService.uploadFile(file);
+    const storageUrl = await this.fileService.uploadFile({ file });
 
     return {
       fileUrl: storageUrl,

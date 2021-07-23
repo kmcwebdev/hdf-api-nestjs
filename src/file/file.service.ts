@@ -8,12 +8,20 @@ import { Injectable } from '@nestjs/common';
 export class FileService {
   constructor(private readonly azureStorage: AzureStorageService) {}
 
-  async uploadFile(file: UploadedFileMetadata) {
-    // If you don't want to override files.
-    // file = {
-    //   ...file,
-    //   originalname: `${file.originalname}-${Date.now()}`,
-    // };
+  /**
+   * @param data
+   * @returns fileUrl
+   */
+  async uploadFile(data: { file: UploadedFileMetadata; override?: true }) {
+    let { file } = data;
+    const { override } = data;
+
+    file = {
+      ...file,
+      originalname: override
+        ? file.originalname
+        : `${file.originalname}-${Date.now()}`,
+    };
 
     return await this.azureStorage.upload(file);
   }

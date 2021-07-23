@@ -31,11 +31,23 @@ model User {
   clearedVisitors          VisitorStatus[]
   lockedLogs               UserLockStatusLog[] @relation("lockedLogToUser")
   lockedByUsers            UserLockStatusLog[] @relation("lockedUser")
+  refreshTokens            RefreshToken[]
   dateCreated              DateTime            @default(now()) @db.Date
   timeCreated              DateTime            @default(now()) @db.Time
 
 
   @@map("users")
+}
+
+model RefreshToken {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  user      User     @relation(fields: [userId], references: [id])
+  token     String
+  isRevoked Boolean  @default(false)
+  expiredAt DateTime @default(now())
+
+  @@map("refresh_tokens")
 }
 
 model Permission {

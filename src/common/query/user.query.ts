@@ -50,6 +50,12 @@ export class PTUserQuery extends PartialType(PaginationQuery) {
 
   @ApiProperty()
   @IsOptional()
+  @IsNotEmpty()
+  @IsString()
+  readonly organization: string;
+
+  @ApiProperty()
+  @IsOptional()
   @IsDateString()
   @Validate(IsBeforeConstraint, ['createdTo'])
   createdFrom: Date;
