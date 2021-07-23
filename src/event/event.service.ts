@@ -1,12 +1,16 @@
 import { Injectable } from '@nestjs/common';
 import { CreateEventDTO } from 'src/common/dto/event/create-event.dto';
+import { PTEventQuery } from 'src/common/query/event/event.query';
+import { paginate } from 'src/common/utils/paginate.util';
 import { PrismaClientService } from 'src/prisma-client/prisma-client.service';
 
 @Injectable()
 export class EventService {
   constructor(private prismaClientService: PrismaClientService) {}
 
-  async getEvents() {
+  async getEvents(query: PTEventQuery) {
+    const { page, limit, skip } = paginate(query.page, query.limit);
+
     return true;
   }
 

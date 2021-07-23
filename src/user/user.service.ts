@@ -10,7 +10,7 @@ import { InternalRegisterDTO } from 'src/common/dto/user/internal-register.dto';
 import { PTUpdateProfileDTO } from 'src/common/dto/user/update-profile.dto';
 import { UserType } from 'src/common/enum/user-type.enum';
 import { GraphUser } from 'src/common/interface/azure-graph/get-user.interface';
-import { PTUserQuery } from 'src/common/query/user.query';
+import { PTUserQuery } from 'src/common/query/user/user.query';
 import { mailDomainIs } from 'src/common/utils/email-domain-check.util';
 import { hashPassword } from 'src/common/utils/hashed-password.util';
 import { paginate } from 'src/common/utils/paginate.util';

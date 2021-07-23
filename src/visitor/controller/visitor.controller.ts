@@ -17,7 +17,7 @@ export class VisitorController {
     return this.visitorService.checkVisitorEmail(email);
   }
 
-  @Get('check-last-visit-status')
+  @Get('last-visit')
   @ApiQuery({ type: EmailQuery })
   @ApiOkResponse({ description: 'Success' })
   checkLastVisitorVisitStatus(@Query() { email }: EmailQuery) {
@@ -27,7 +27,7 @@ export class VisitorController {
     });
   }
 
-  @Patch('clear-visitor')
+  @Patch('clear')
   @UseGuards(JwtAuthGuard)
   @ApiQuery({ type: EmailQuery })
   @ApiOkResponse({ description: 'Success' })

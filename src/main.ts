@@ -44,7 +44,7 @@ async function bootstrap() {
   app.use(compression());
 
   app.use(
-    ['/api-docs'],
+    ['/docs'],
     basicAuth({
       challenge: true,
       users: {
@@ -60,12 +60,12 @@ async function bootstrap() {
 
   const document = SwaggerModule.createDocument(app, config);
 
-  SwaggerModule.setup('api-docs', app, document);
+  SwaggerModule.setup('docs', app, document);
 
   const prismaClientService: PrismaClientService = app.get(PrismaClientService);
 
   prismaClientService.enableShutdownHooks(app);
 
-  await app.listen(process.env.PORT || 8080);
+  await app.listen(5000);
 }
 bootstrap();

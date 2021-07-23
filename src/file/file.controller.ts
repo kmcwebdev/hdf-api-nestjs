@@ -38,10 +38,10 @@ export class FileController {
     @UploadedFile()
     file: UploadedFileMetadata,
   ) {
-    const storageUrl = await this.fileService.uploadFile({ file });
+    await this.fileService.uploadFile({ file });
 
     return {
-      fileUrl: storageUrl,
+      fileUrl: `https://cdn.kmc.solutions/events/${file.originalname}`,
     };
   }
 }

@@ -29,7 +29,7 @@ import {
   UpdateProfileDTO,
 } from 'src/common/dto/user/update-profile.dto';
 import { EmailQuery } from 'src/common/query/email.query';
-import { PTUserQuery } from 'src/common/query/user.query';
+import { PTUserQuery } from 'src/common/query/user/user.query';
 import { UserService } from './user.service';
 
 @ApiTags('User')
@@ -51,7 +51,27 @@ export class UserController {
     return this.userService.getUser(req.user.id);
   }
 
-  @Get('check-internal-user-duplication')
+  @Post('internal')
+  @ApiBody({ type: InternalRegisterDTO })
+  @ApiCreatedResponse({ description: 'Created' })
+  registerInternalUser(@Req() req: Request, @Body() data: InternalRegisterDTO) {
+    return this.userService.registerInternalUser({
+      userId: req.user.id,
+      payload: data,
+    });
+  }
+
+  @Post('external')
+  @ApiBody({ type: ExternalRegisterDTO })
+  @ApiCreatedResponse({ description: 'Created' })
+  registerExternalUser(@Req() req: Request, @Body() data: ExternalRegisterDTO) {
+    return this.userService.registerExternalUser({
+      userId: req.user.id,
+      payload: data,
+    });
+  }
+
+  @Get('internal-duplication')
   @ApiQuery({ type: EmailQuery })
   @ApiOkResponse({ description: 'Success' })
   @ApiBadRequestResponse({
@@ -61,7 +81,7 @@ export class UserController {
     return this.userService.checkInternalUserDuplication(email);
   }
 
-  @Get('check-external-user-duplication')
+  @Get('external-duplication')
   @ApiQuery({ type: EmailQuery })
   @ApiOkResponse({ description: 'Success' })
   @ApiBadRequestResponse({
@@ -102,26 +122,6 @@ export class UserController {
     return this.userService.unlockUser({
       lockUserId: id,
       lockedById: req.user.id,
-    });
-  }
-
-  @Post('register-internal')
-  @ApiBody({ type: InternalRegisterDTO })
-  @ApiCreatedResponse({ description: 'Created' })
-  registerInternalUser(@Req() req: Request, @Body() data: InternalRegisterDTO) {
-    return this.userService.registerInternalUser({
-      userId: req.user.id,
-      payload: data,
-    });
-  }
-
-  @Post('register-external')
-  @ApiBody({ type: ExternalRegisterDTO })
-  @ApiCreatedResponse({ description: 'Created' })
-  registerExternalUser(@Req() req: Request, @Body() data: ExternalRegisterDTO) {
-    return this.userService.registerExternalUser({
-      userId: req.user.id,
-      payload: data,
     });
   }
 
