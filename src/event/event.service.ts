@@ -11,7 +11,7 @@ export class EventService {
   async getEvents(query: PTEventQuery) {
     const { page, limit, skip } = paginate(query.page, query.limit);
 
-    return true;
+    return { page, limit, skip };
   }
 
   async getEvent(id: number) {
