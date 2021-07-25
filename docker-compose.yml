@@ -10,7 +10,7 @@ services:
       dockerfile: ./Dockerfile
     command: yarn start:debug
     ports:
-      - 3000:3000
+      - 5000:5000
       - 9229:9229
     networks:
       - nesjs-network
@@ -27,7 +27,7 @@ services:
       dockerfile: ./Dockerfile
     command: yarn start:prod
     ports:
-      - 3000:3000
+      - 5000:5000
       - 9229:9229
     networks:
       - nesjs-network
