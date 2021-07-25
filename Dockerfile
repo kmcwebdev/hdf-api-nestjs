@@ -16,6 +16,4 @@ RUN yarn install
 
 COPY . .
 
-COPY --from=development /app/dist ./dist
-
 CMD ["node", "dist/src/main"]
