@@ -6,6 +6,8 @@ COPY package*.json yarn.lock ./
 
 RUN yarn install
 
+RUN yarn prisma generate
+
 RUN yarn install --only=development
 
 COPY . .
