@@ -3,11 +3,35 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
+import { Visitor } from '@prisma/client';
+import { CreateVisitorDTO } from 'src/common/dto/visitor/create-visitor.dto';
 import { PrismaClientService } from 'src/prisma-client/prisma-client.service';
 
 @Injectable()
 export class VisitorService {
   constructor(private prismaClientService: PrismaClientService) {}
+
+  async getOrCreateVisitor(data: CreateVisitorDTO) {
+    const { email } = data;
+
+    let visitor: Visitor;
+
+    const getVisitor = await this.checkVisitorEmail(email);
+
+    if (getVisitor) {
+      visitor = getVisitor;
+    }
+
+    if (!getVisitor) {
+      const createdVisitor = await this.prismaClientService.visitor.create({
+        data,
+      });
+
+      visitor = createdVisitor;
+    }
+
+    return visitor;
+  }
 
   async checkVisitorEmail(email: string) {
     const result = await this.prismaClientService.visitor.findUnique({
