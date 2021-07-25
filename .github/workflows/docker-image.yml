@@ -13,6 +13,6 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: Build the Docker image
-        run: docker build . --file Dockerfile --tag hdf-api-nestjs:$(date +%s)
+        run: docker build . --tag hdf-api:v1
       - name: Check docker images
-        run: docker images
+        run: whoami
