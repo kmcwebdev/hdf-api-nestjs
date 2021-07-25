@@ -13,6 +13,4 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: Build the Docker image
-        run: docker build . --tag hdf-api:v1
-      - name: Check docker images
-        run: whoami
+        run: docker-compose up prod
