@@ -4,11 +4,13 @@ WORKDIR /usr/src/app
 
 COPY package*.json yarn.lock ./
 
-RUN yarn install && yarn prisma generate
+RUN yarn install
 
-RUN yarn install && yarn prisma generate --only=development
+RUN yarn install --only=development
 
 COPY . .
+
+RUN yarn prisma generate
 
 RUN yarn build
 
