@@ -13,12 +13,12 @@ import { JwtAuthGuard } from 'src/auth/guard/jwt.guard';
 import { FileService } from './file.service';
 
 @ApiTags('File')
-@Controller('file')
+@Controller('files')
 @UseGuards(JwtAuthGuard)
 export class FileController {
   constructor(private fileService: FileService) {}
 
-  @Post('azure/upload')
+  @Post('azure-blob/upload')
   @ApiConsumes('multipart/form-data')
   @ApiBody({
     schema: {
