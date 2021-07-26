@@ -9,6 +9,7 @@ import * as helmet from 'helmet';
 import * as hpp from 'hpp';
 import * as xss from 'xss-clean';
 import { AppModule } from './app.module';
+import { TransformInterceptor } from './common/interceptor/transform.interceptor';
 import { HttpExceptionFilter } from './common/serializer/exception/http.exception';
 import { PrismaExceptionFilter } from './common/serializer/exception/prisma.exception';
 import { PrismaClientService } from './prisma-client/prisma-client.service';
@@ -18,6 +19,8 @@ async function bootstrap() {
 
   app.useGlobalFilters(new HttpExceptionFilter());
   app.useGlobalFilters(new PrismaExceptionFilter());
+
+  app.useGlobalInterceptors(new TransformInterceptor());
 
   if (process.env.NODE_ENV === 'development') {
     app.setGlobalPrefix('api');
