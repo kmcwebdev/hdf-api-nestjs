@@ -18,7 +18,7 @@ import { FileService } from './file.service';
 export class FileController {
   constructor(private fileService: FileService) {}
 
-  @Post('upload')
+  @Post('azure/upload')
   @ApiConsumes('multipart/form-data')
   @ApiBody({
     schema: {
@@ -34,11 +34,11 @@ export class FileController {
   @ApiOkResponse({ description: 'Success' })
   @HttpCode(200)
   @UseInterceptors(FileInterceptor('file'))
-  async UploadedFilesUsingService(
+  async uploadFileInAzure(
     @UploadedFile()
     file: UploadedFileMetadata,
   ) {
-    await this.fileService.uploadFile({ file });
+    await this.fileService.uploadFileInAzure({ file });
 
     return {
       fileUrl: `https://cdn.kmc.solutions/events/${file.originalname}`,

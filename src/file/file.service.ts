@@ -12,7 +12,10 @@ export class FileService {
    * @param data
    * @returns fileUrl
    */
-  async uploadFile(data: { file: UploadedFileMetadata; override?: true }) {
+  async uploadFileInAzure(data: {
+    file: UploadedFileMetadata;
+    override?: true;
+  }) {
     let { file } = data;
     const { override } = data;
 
