@@ -106,6 +106,12 @@ export class UserService {
         id: true,
         email: true,
         userType: true,
+        permissions: {
+          select: {
+            id: true,
+            type: true,
+          },
+        },
         isLocked: true,
         profile: true,
         dateCreated: true,

@@ -1,9 +1,4 @@
-import {
-  MiddlewareConsumer,
-  Module,
-  NestModule,
-  RequestMethod,
-} from '@nestjs/common';
+import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { SendGridModule } from '@ntegral/nestjs-sendgrid';
 import { S3Module } from 'nestjs-s3';
@@ -13,7 +8,6 @@ import authEnv from './common/config/auth.config';
 import erpEnv from './common/config/erp.config';
 import s3Env from './common/config/s3.config';
 import sendgridEnv from './common/config/sengrid.config';
-import { LoggerMiddleware } from './common/middleware/logger.middleware';
 import { EventModule } from './event/event.module';
 import { FileModule } from './file/file.module';
 import { PrismaClientModule } from './prisma-client/prisma-client.module';
@@ -53,11 +47,4 @@ import { VisitorModule } from './visitor/visitor.module';
     FileModule,
   ],
 })
-export class AppModule implements NestModule {
-  configure(consumer: MiddlewareConsumer) {
-    consumer.apply(LoggerMiddleware).forRoutes({
-      path: '*',
-      method: RequestMethod.GET,
-    });
-  }
-}
+export class AppModule {}
