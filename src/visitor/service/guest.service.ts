@@ -58,6 +58,9 @@ export class GuestService {
       where: {
         AND: [
           {
+            guest: { equals: true },
+          },
+          {
             siteId: { equals: siteId },
           },
           {
