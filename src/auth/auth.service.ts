@@ -103,6 +103,12 @@ export class AuthService {
   async checkPasswordResetToken(passwordResetToken: string) {
     const user = await this.prismaClientService.user.findUnique({
       where: { passwordResetToken },
+      select: {
+        id: true,
+        email: true,
+        passwordResetToken: true,
+        passwordResetTokenExpire: true,
+      },
     });
 
     if (user) {

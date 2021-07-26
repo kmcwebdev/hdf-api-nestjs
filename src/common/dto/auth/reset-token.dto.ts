@@ -4,7 +4,7 @@ import { IsString, MaxLength, MinLength } from 'class-validator';
 export class ResetTokenDTO {
   @ApiProperty({ type: String })
   @IsString()
-  @MinLength(64)
-  @MaxLength(64)
+  @MinLength(137, { message: 'Invalid reset token' })
+  @MaxLength(137, { message: 'Invalid reset token' })
   readonly resetToken: string;
 }
