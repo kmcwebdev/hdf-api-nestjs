@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
-import { IsInt, IsNotEmpty, IsString } from 'class-validator';
+import { ArrayMinSize, IsArray, IsInt } from 'class-validator';
 
 export class QuestionDTO {
   @ApiProperty()
@@ -9,7 +9,8 @@ export class QuestionDTO {
   readonly questionId: number;
 
   @ApiProperty()
-  @IsNotEmpty()
-  @IsString()
-  readonly answer: string;
+  @IsArray()
+  @ArrayMinSize(1)
+  @Type(() => String)
+  readonly answers: string[];
 }

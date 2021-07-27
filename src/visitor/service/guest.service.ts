@@ -131,9 +131,9 @@ export class GuestService {
 
     const guestIsClearOfAnySymptoms = questions
       .map(
-        (data) =>
-          data.answer.includes('None of the above') ||
-          data.answer.includes('No'),
+        (question) =>
+          question.answers.includes('None of the above') ||
+          question.answers.includes('No'),
       )
       .filter((answer) => answer === false).length;
 
@@ -164,7 +164,7 @@ export class GuestService {
         data: {
           visit: { connect: { id: visit.id } },
           question: { connect: { id: data.questionId } },
-          answer: data.answer,
+          answer: data.answers,
         },
       });
     });
