@@ -8,7 +8,7 @@ import { AzureGraphApiService } from 'src/azure-graph-api/azure-graph-api.servic
 import { ExternalRegisterDTO } from 'src/common/dto/user/external-register.dto';
 import { InternalRegisterDTO } from 'src/common/dto/user/internal-register.dto';
 import { PTUpdateProfileDTO } from 'src/common/dto/user/update-profile.dto';
-import { UserType } from 'src/common/enum/user-type.enum';
+import { UserType } from 'src/common/enum/user/user-type.enum';
 import { GraphUser } from 'src/common/interface/azure-graph/get-user.interface';
 import { PTUserQuery } from 'src/common/query/user/user.query';
 import { mailDomainIs } from 'src/common/utils/email-domain-check.util';

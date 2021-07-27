@@ -12,28 +12,29 @@ generator client {
 }
 
 model User {
-  id                       Int                 @id @default(autoincrement())
-  profileId                Int?                @unique
-  profile                  UserProfile?        @relation(fields: [profileId], references: [id])
-  email                    String              @unique
-  password                 String
-  userType                 String
-  isLocked                 Boolean             @default(true)
-  registeredById           Int?
-  registeredBy             User?               @relation("EncoderToUser", fields: [registeredById], references: [id])
-  listOfEncodedAccounts    User[]              @relation("EncoderToUser")
-  passwordResetToken       String?             @unique
-  passwordResetTokenExpire DateTime?
-  passwordChangedAt        DateTime?
-  emailConfirm             Boolean             @default(false)
-  permissions              Permission[]
-  visitorNotes             VisitorNote[]
-  clearedVisitors          VisitorStatus[]
-  lockedLogs               UserLockStatusLog[] @relation("lockedLogToUser")
-  lockedByUsers            UserLockStatusLog[] @relation("lockedUser")
-  refreshTokens            RefreshToken[]
-  dateCreated              DateTime            @default(now()) @db.Date
-  timeCreated              DateTime            @default(now()) @db.Time
+  id                           Int                 @id @default(autoincrement())
+  profileId                    Int?                @unique
+  profile                      UserProfile?        @relation(fields: [profileId], references: [id])
+  email                        String              @unique
+  password                     String
+  userType                     String
+  isLocked                     Boolean             @default(true)
+  registeredById               Int?
+  registeredBy                 User?               @relation("EncoderToUser", fields: [registeredById], references: [id])
+  listOfEncodedAccounts        User[]              @relation("EncoderToUser")
+  passwordResetToken           String?             @unique
+  passwordResetTokenExpire     DateTime?
+  passwordChangedAt            DateTime?
+  emailConfirm                 Boolean             @default(false)
+  permissions                  Permission[]
+  visitorNotes                 VisitorNote[]
+  clearedVisitors              VisitorStatus[]
+  UploadedclearanceForVisitors Clearance[]
+  lockedLogs                   UserLockStatusLog[] @relation("lockedLogToUser")
+  lockedByUsers                UserLockStatusLog[] @relation("lockedUser")
+  refreshTokens                RefreshToken[]
+  dateCreated                  DateTime            @default(now()) @db.Date
+  timeCreated                  DateTime            @default(now()) @db.Time
 
 
   @@map("users")
@@ -201,6 +202,8 @@ model Clearance {
   visitorId    Int
   visitor      Visitor  @relation(fields: [visitorId], references: [id], onDelete: Cascade)
   clearanceUrl String?
+  uploadedById Int
+  uploadedBy   User     @relation(fields: [uploadedById], references: [id])
   notes        String
   dateCreated  DateTime @default(now()) @db.Date
   timeCreated  DateTime @default(now()) @db.Timestamptz

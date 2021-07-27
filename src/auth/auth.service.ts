@@ -8,7 +8,7 @@ import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { compare, hash } from 'bcrypt';
 import { LoginDTO } from 'src/common/dto/auth/login.dto';
-import { UserType } from 'src/common/enum/user-type.enum';
+import { UserType } from 'src/common/enum/user/user-type.enum';
 import { diffInMinutes } from 'src/common/utils/diff-in-minutes.util';
 import { mailDomainIs } from 'src/common/utils/email-domain-check.util';
 import { PrismaClientService } from 'src/prisma-client/prisma-client.service';
