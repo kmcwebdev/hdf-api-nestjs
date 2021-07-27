@@ -15,9 +15,9 @@ model User {
   id                           Int                 @id @default(autoincrement())
   profileId                    Int?                @unique
   profile                      UserProfile?        @relation(fields: [profileId], references: [id])
-  email                        String              @unique
+  email                        String              @unique @db.VarChar(100)
   password                     String
-  userType                     String
+  userType                     String              @db.VarChar(50)
   isLocked                     Boolean             @default(true)
   registeredById               Int?
   registeredBy                 User?               @relation("EncoderToUser", fields: [registeredById], references: [id])
@@ -44,7 +44,7 @@ model RefreshToken {
   id        Int      @id @default(autoincrement())
   userId    Int
   user      User     @relation(fields: [userId], references: [id])
-  token     String
+  token     String   @db.VarChar(255)
   isRevoked Boolean  @default(false)
   expiredAt DateTime @default(now())
 
@@ -53,7 +53,7 @@ model RefreshToken {
 
 model Permission {
   id    Int    @id @default(autoincrement())
-  type  String @unique
+  type  String @unique @db.VarChar(100)
   users User[]
 
   @@map("permissions")
@@ -190,7 +190,7 @@ model Survey {
   visit       Visit    @relation(fields: [visitId], references: [id], onDelete: Cascade)
   questionId  Int
   question    Question @relation(fields: [questionId], references: [id])
-  answer      String
+  answer      String[]
   dateCreated DateTime @default(now()) @db.Date
   timeCreated DateTime @default(now()) @db.Timestamptz
 
@@ -267,8 +267,8 @@ model TravelLocation {
 
 model Event {
   id            Int      @id @default(autoincrement())
-  name          String
-  imageUrl      String
+  name          String   @db.VarChar(100)
+  imageUrl      String   @db.VarChar(255)
   dateFrom      DateTime @db.Date
   dateTo        DateTime @db.Date
   time          DateTime @db.Timestamptz
@@ -276,15 +276,15 @@ model Event {
   site          Site     @relation(fields: [siteId], references: [siteId])
   floorId       Int
   floor         Floor    @relation(fields: [floorId], references: [floorId])
-  contactPerson String
-  contactEmail  String
+  contactPerson String   @db.VarChar(100)
+  contactEmail  String   @db.VarChar(100)
 
   @@map("events")
 }
 
 model Site {
   siteId   Int     @id
-  siteName String  @unique
+  siteName String  @unique @db.VarChar(100)
   floors   Floor[]
   Visits   Visit[]
   events   Event[]
@@ -294,7 +294,7 @@ model Site {
 
 model Floor {
   floorId Int     @id
-  floor   String
+  floor   String  @db.VarChar(100)
   sites   Site[]
   visits  Visit[]
   events  Event[]
