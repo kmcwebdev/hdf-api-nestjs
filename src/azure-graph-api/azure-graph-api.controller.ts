@@ -4,7 +4,7 @@ import { JwtAuthGuard } from 'src/auth/guard/jwt.guard';
 import { EmailQuery } from 'src/common/query/email.query';
 import { AzureGraphApiService } from './azure-graph-api.service';
 
-@ApiTags('Azure grap')
+@ApiTags('Azure graph')
 @Controller('azure-graph')
 @UseGuards(JwtAuthGuard)
 export class AzureGraphApiController {
