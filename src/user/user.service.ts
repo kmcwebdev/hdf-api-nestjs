@@ -8,6 +8,7 @@ import { AzureGraphApiService } from 'src/azure-graph-api/azure-graph-api.servic
 import { ExternalRegisterDTO } from 'src/common/dto/user/external-register.dto';
 import { InternalRegisterDTO } from 'src/common/dto/user/internal-register.dto';
 import { PTUpdateProfileDTO } from 'src/common/dto/user/update-profile.dto';
+import { UpdateUserPermissionDTO } from 'src/common/dto/user/update-user-permission.dto';
 import { UserType } from 'src/common/enum/user/user-type.enum';
 import { GraphUser } from 'src/common/interface/azure-graph/get-user.interface';
 import { PTUserQuery } from 'src/common/query/user/user.query';
@@ -61,6 +62,13 @@ export class UserService {
           id: true,
           email: true,
           userType: true,
+          permissions: {
+            select: {
+              id: true,
+              label: true,
+              value: true,
+            },
+          },
           isLocked: true,
           profile: true,
           dateCreated: true,
@@ -109,13 +117,47 @@ export class UserService {
         permissions: {
           select: {
             id: true,
-            type: true,
+            label: true,
+            value: true,
           },
         },
         isLocked: true,
         profile: true,
         dateCreated: true,
         timeCreated: true,
+      },
+    });
+  }
+
+  async getUserPermissions() {
+    return await this.prismaClientService.permission.findMany();
+  }
+
+  async updateUserPermissions(data: {
+    method: 'PATCH' | 'DELETE';
+    userId: number;
+    payload: UpdateUserPermissionDTO;
+  }) {
+    const { method, userId, payload } = data;
+
+    return await this.prismaClientService.user.update({
+      where: { id: userId },
+      data: {
+        permissions: {
+          [method === 'PATCH' ? 'connect' : 'disconnect']: {
+            value: payload.permission,
+          },
+        },
+      },
+      select: {
+        id: true,
+        permissions: {
+          select: {
+            id: true,
+            label: true,
+            value: true,
+          },
+        },
       },
     });
   }
@@ -167,9 +209,25 @@ export class UserService {
   async updateProfile(data: { id: number; payload: PTUpdateProfileDTO }) {
     const { id, payload } = data;
 
-    return await this.prismaClientService.userProfile.update({
+    return await this.prismaClientService.user.update({
       where: { id },
-      data: payload,
+      data: {
+        profile: {
+          update: payload,
+        },
+      },
+      select: {
+        id: true,
+        profile: {
+          select: {
+            id: true,
+            firstName: true,
+            lastName: true,
+            phoneNumber: true,
+            organization: true,
+          },
+        },
+      },
     });
   }
 

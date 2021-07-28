@@ -1,26 +1,34 @@
 export default [
   {
-    type: 'user-management',
+    label: 'User management',
+    value: 'user-management',
   },
   {
-    type: 'can-locked-user',
+    label: 'Can locked user',
+    value: 'can-locked-user',
   },
   {
-    type: 'can-view-report',
+    label: 'Can view report',
+    value: 'can-view-report',
   },
   {
-    type: 'can-extract-report',
+    label: 'Can extract report',
+    value: 'can-extract-report',
   },
   {
-    type: 'can-clear-guest',
+    label: 'Can clear guest',
+    value: 'can-clear-guest',
   },
   {
-    type: 'can-clear-member',
+    label: 'Can clear member',
+    value: 'can-clear-member',
   },
   {
-    type: 'can-create-internal-user',
+    label: 'Can create internal user',
+    value: 'can-create-internal-user',
   },
   {
-    type: 'can-create-external-user',
+    label: 'Can create external user',
+    value: 'can-create-external-user',
   },
 ];

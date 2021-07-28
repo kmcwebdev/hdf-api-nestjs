@@ -2,6 +2,7 @@ import {
   Body,
   Controller,
   DefaultValuePipe,
+  Delete,
   Get,
   Param,
   ParseIntPipe,
@@ -28,6 +29,7 @@ import {
   PTUpdateProfileDTO,
   UpdateProfileDTO,
 } from 'src/common/dto/user/update-profile.dto';
+import { UpdateUserPermissionDTO } from 'src/common/dto/user/update-user-permission.dto';
 import { EmailQuery } from 'src/common/query/email.query';
 import { PTUserQuery } from 'src/common/query/user/user.query';
 import { UserService } from './user.service';
@@ -49,6 +51,44 @@ export class UserController {
   @ApiOkResponse({ description: 'Success' })
   getMe(@Req() req: Request) {
     return this.userService.getUser(req.user.id);
+  }
+
+  @Get('permissions')
+  @ApiOkResponse({ description: 'Success' })
+  getUserPermissions() {
+    return this.userService.getUserPermissions();
+  }
+
+  @Patch('permissions/:id')
+  @ApiParam({ name: 'id', description: 'User id' })
+  @ApiBody({ type: UpdateUserPermissionDTO })
+  @ApiOkResponse({ description: 'Success' })
+  connectUserPermissions(
+    @Req() req: Request,
+    @Param('id', new ParseIntPipe()) id: number,
+    @Body() data: UpdateUserPermissionDTO,
+  ) {
+    return this.userService.updateUserPermissions({
+      method: req.method as 'PATCH',
+      userId: id,
+      payload: data,
+    });
+  }
+
+  @Delete('permissions/:id')
+  @ApiParam({ name: 'id', description: 'User id' })
+  @ApiBody({ type: UpdateUserPermissionDTO })
+  @ApiOkResponse({ description: 'Success' })
+  disconnectUserPermissions(
+    @Req() req: Request,
+    @Param('id', new ParseIntPipe()) id: number,
+    @Body() data: UpdateUserPermissionDTO,
+  ) {
+    return this.userService.updateUserPermissions({
+      method: req.method as 'DELETE',
+      userId: id,
+      payload: data,
+    });
   }
 
   @Post('internal')
@@ -92,7 +132,11 @@ export class UserController {
   }
 
   @Patch('profile/:id?')
-  @ApiParam({ name: 'id', required: false })
+  @ApiParam({
+    name: 'id',
+    required: false,
+    description: 'User id',
+  })
   @ApiBody({ type: UpdateProfileDTO })
   @ApiOkResponse({ description: 'Success' })
   updateProfile(

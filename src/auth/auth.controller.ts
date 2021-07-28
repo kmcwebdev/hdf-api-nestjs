@@ -50,6 +50,7 @@ export class AuthController {
       email: user.email,
       userType: user.userType,
       isLocked: user.isLocked,
+      permissions: user.permissions,
       token,
     });
   }

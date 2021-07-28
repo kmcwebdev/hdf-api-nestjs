@@ -48,6 +48,13 @@ export class AuthService {
         email: true,
         password: true,
         userType: true,
+        permissions: {
+          select: {
+            id: true,
+            label: true,
+            value: true,
+          },
+        },
         isLocked: true,
       },
     });
