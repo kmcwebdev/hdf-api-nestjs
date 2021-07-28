@@ -240,6 +240,11 @@ export class UserService {
         isLocked: true,
         lockedLogs: { create: { lockedById, operation: 'Locked' } },
       },
+      select: {
+        id: true,
+        email: true,
+        isLocked: true,
+      },
     });
   }
 
@@ -251,6 +256,11 @@ export class UserService {
       data: {
         isLocked: false,
         lockedLogs: { create: { lockedById, operation: 'Unlocked' } },
+      },
+      select: {
+        id: true,
+        email: true,
+        isLocked: true,
       },
     });
   }
@@ -303,7 +313,6 @@ export class UserService {
         email,
         password: hashedPassword,
         userType: UserType.External,
-        emailConfirm: false,
         isLocked: false,
         registeredBy: {
           connect: { id: userId },
