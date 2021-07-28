@@ -31,4 +31,12 @@ export default [
     label: 'Can create external user',
     value: 'can-create-external-user',
   },
+  {
+    label: 'Can grant and delete permissions',
+    value: 'can-grant-and-delete-permissions',
+  },
+  {
+    label: 'Can create permissions',
+    value: 'can-create-permissions',
+  },
 ];
