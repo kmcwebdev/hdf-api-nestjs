@@ -231,14 +231,11 @@ export class UserService {
     });
   }
 
-  async lockUser(data: { lockUserId: number; lockedById: number }) {
-    const { lockUserId, lockedById } = data;
-
+  async lockUser(lockUserId: number) {
     return await this.prismaClientService.user.update({
       where: { id: lockUserId },
       data: {
         isLocked: true,
-        lockedLogs: { create: { lockedById, operation: 'Locked' } },
       },
       select: {
         id: true,
@@ -248,14 +245,11 @@ export class UserService {
     });
   }
 
-  async unlockUser(data: { lockUserId: number; lockedById: number }) {
-    const { lockUserId, lockedById } = data;
-
+  async unlockUser(lockUserId: number) {
     return await this.prismaClientService.user.update({
       where: { id: lockUserId },
       data: {
         isLocked: false,
-        lockedLogs: { create: { lockedById, operation: 'Unlocked' } },
       },
       select: {
         id: true,
