@@ -60,6 +60,7 @@ model Permission {
 }
 
 model UserLockStatusLog {
+  id           Int      @id @default(autoincrement())
   lockedUserId Int
   lockedUser   User     @relation("lockedLogToUser", fields: [lockedUserId], references: [id])
   lockedById   Int
@@ -68,7 +69,6 @@ model UserLockStatusLog {
   dateCreated  DateTime @default(now()) @db.Date
   timeCreated  DateTime @default(now()) @db.Time
 
-  @@id([lockedUserId, lockedById])
   @@map("user_lock_status_logs")
 }
 
