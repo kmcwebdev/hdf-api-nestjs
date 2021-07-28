@@ -190,7 +190,7 @@ model Survey {
   visit       Visit    @relation(fields: [visitId], references: [id], onDelete: Cascade)
   questionId  Int
   question    Question @relation(fields: [questionId], references: [id])
-  answer      String[]
+  answers     String[]
   dateCreated DateTime @default(now()) @db.Date
   timeCreated DateTime @default(now()) @db.Timestamptz
 

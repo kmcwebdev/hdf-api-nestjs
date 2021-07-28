@@ -159,12 +159,12 @@ export class GuestService {
       });
     }
 
-    questions.forEach(async (data) => {
+    questions.forEach(async (question) => {
       await this.prismaClientService.survey.create({
         data: {
           visit: { connect: { id: visit.id } },
-          question: { connect: { id: data.questionId } },
-          answer: data.answers,
+          question: { connect: { id: question.questionId } },
+          answers: question.answers,
         },
       });
     });
