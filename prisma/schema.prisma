@@ -12,29 +12,27 @@ generator client {
 }
 
 model User {
-  id                           Int                 @id @default(autoincrement())
-  profileId                    Int?                @unique
-  profile                      UserProfile?        @relation(fields: [profileId], references: [id])
-  email                        String              @unique @db.VarChar(100)
+  id                           Int             @id @default(autoincrement())
+  profileId                    Int?            @unique
+  profile                      UserProfile?    @relation(fields: [profileId], references: [id])
+  email                        String          @unique @db.VarChar(100)
   password                     String
-  userType                     String              @db.VarChar(50)
-  isLocked                     Boolean             @default(true)
+  userType                     String          @db.VarChar(50)
+  isLocked                     Boolean         @default(true)
   registeredById               Int?
-  registeredBy                 User?               @relation("EncoderToUser", fields: [registeredById], references: [id])
-  listOfEncodedAccounts        User[]              @relation("EncoderToUser")
-  passwordResetToken           String?             @unique
+  registeredBy                 User?           @relation("EncoderToUser", fields: [registeredById], references: [id])
+  listOfEncodedAccounts        User[]          @relation("EncoderToUser")
+  passwordResetToken           String?         @unique
   passwordResetTokenExpire     DateTime?
   passwordChangedAt            DateTime?
-  emailConfirm                 Boolean             @default(false)
+  emailConfirm                 Boolean         @default(false)
   permissions                  Permission[]
   visitorNotes                 VisitorNote[]
   clearedVisitors              VisitorStatus[]
   UploadedclearanceForVisitors Clearance[]
-  lockedLogs                   UserLockStatusLog[] @relation("lockedLogToUser")
-  lockedByUsers                UserLockStatusLog[] @relation("lockedUser")
   refreshTokens                RefreshToken[]
-  dateCreated                  DateTime            @default(now()) @db.Date
-  timeCreated                  DateTime            @default(now()) @db.Time
+  dateCreated                  DateTime        @default(now()) @db.Date
+  timeCreated                  DateTime        @default(now()) @db.Time
 
   @@map("users")
 }
@@ -57,19 +55,6 @@ model Permission {
   users User[]
 
   @@map("permissions")
-}
-
-model UserLockStatusLog {
-  id           Int      @id @default(autoincrement())
-  lockedUserId Int
-  lockedUser   User     @relation("lockedLogToUser", fields: [lockedUserId], references: [id])
-  lockedById   Int
-  lockedBy     User     @relation("lockedUser", fields: [lockedById], references: [id])
-  operation    String
-  dateCreated  DateTime @default(now()) @db.Date
-  timeCreated  DateTime @default(now()) @db.Time
-
-  @@map("user_lock_status_logs")
 }
 
 model UserProfile {
