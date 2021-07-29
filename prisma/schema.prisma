@@ -71,23 +71,33 @@ model UserProfile {
 }
 
 model Visitor {
-  id                Int             @id @default(autoincrement())
-  isBlocked         Boolean         @default(false)
-  firstName         String          @db.VarChar(100)
-  lastName          String          @db.VarChar(100)
-  email             String          @unique @db.VarChar(100)
-  phoneNumber       String          @db.VarChar(100)
-  address           String          @db.VarChar(100)
-  company           String          @db.VarChar(100)
+  id                Int               @id @default(autoincrement())
+  isBlocked         Boolean           @default(false)
+  firstName         String            @db.VarChar(100)
+  lastName          String            @db.VarChar(100)
+  email             String            @unique @db.VarChar(100)
+  visitorSubEmails  VisitorSubEmail[]
+  phoneNumber       String            @db.VarChar(100)
+  address           String            @db.VarChar(100)
+  company           String            @db.VarChar(100)
   clearance         Clearance[]
   tempCheckList     TempCheckList[]
   visitorStatusList VisitorStatus[]
   visitorNotes      VisitorNote[]
   visits            Visit[]
-  dateCreated       DateTime        @default(now()) @db.Date
-  timeCreated       DateTime        @default(now()) @db.Timestamptz
+  dateCreated       DateTime          @default(now()) @db.Date
+  timeCreated       DateTime          @default(now()) @db.Timestamptz
 
   @@map("visitors")
+}
+
+model VisitorSubEmail {
+  id        Int     @id @default(autoincrement())
+  visitorId Int
+  visitor   Visitor @relation(fields: [visitorId], references: [id])
+  email     String  @unique @db.VarChar(100)
+
+  @@map("visitor_sub_emails")
 }
 
 model VisitorStatus {

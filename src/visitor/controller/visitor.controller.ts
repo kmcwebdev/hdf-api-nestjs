@@ -1,7 +1,23 @@
-import { Controller, Get, Patch, Query, Req, UseGuards } from '@nestjs/common';
-import { ApiOkResponse, ApiQuery, ApiTags } from '@nestjs/swagger';
+import {
+  Body,
+  Controller,
+  Get,
+  Patch,
+  Post,
+  Query,
+  Req,
+  UseGuards,
+} from '@nestjs/common';
+import {
+  ApiBody,
+  ApiCreatedResponse,
+  ApiOkResponse,
+  ApiQuery,
+  ApiTags,
+} from '@nestjs/swagger';
 import { Request } from 'express';
 import { JwtAuthGuard } from 'src/auth/guard/jwt.guard';
+import { CreateSubEmailsDTO } from 'src/common/dto/visitor/create-sub-emails.dto';
 import { EmailQuery } from 'src/common/query/email.query';
 import { VisitorService } from '../service/visitor.service';
 
@@ -25,6 +41,13 @@ export class VisitorController {
       email,
       modeOfUse: 'Check',
     });
+  }
+
+  @Post('sub-emails')
+  @ApiBody({ type: CreateSubEmailsDTO })
+  @ApiCreatedResponse({ description: 'Created' })
+  createVisitorSubEmails(@Body() data: CreateSubEmailsDTO) {
+    return this.visitorService.createVisitorSubEmails(data);
   }
 
   @Patch('clear')

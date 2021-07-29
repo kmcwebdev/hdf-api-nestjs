@@ -1,4 +1,4 @@
-export function rateLimitExceededResponse() {
+export function rateLimitExceeded() {
   return {
     statusCode: 429,
     message: 'Request has been blocked',

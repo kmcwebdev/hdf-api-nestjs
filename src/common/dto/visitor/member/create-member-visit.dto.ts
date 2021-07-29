@@ -12,7 +12,7 @@ import {
 } from 'class-validator';
 import { QuestionDTO } from '../question.dto';
 
-export class CreateGuestVisitorDTO {
+export class CreateMemberVisitorDTO {
   @ApiProperty()
   @IsNotEmpty()
   @IsString()
@@ -64,13 +64,4 @@ export class CreateGuestVisitorDTO {
   @IsInt()
   @Type(() => Number)
   readonly floorId: number;
-
-  @ApiProperty()
-  @IsNotEmpty()
-  @IsString()
-  readonly poc: string;
-
-  @ApiProperty()
-  @IsEmail()
-  readonly pocEmail: string;
 }

@@ -4,6 +4,7 @@ import { SendGridModule } from '@ntegral/nestjs-sendgrid';
 import { S3Module } from 'nestjs-s3';
 import { AuthModule } from './auth/auth.module';
 import { AzureGraphApiModule } from './azure-graph-api/azure-graph-api.module';
+import { ChatGateway } from './chat.gateway';
 import authEnv from './common/config/auth.config';
 import erpEnv from './common/config/erp.config';
 import s3Env from './common/config/s3.config';
@@ -46,5 +47,6 @@ import { VisitorModule } from './visitor/visitor.module';
     SiteModule,
     FileModule,
   ],
+  providers: [ChatGateway],
 })
 export class AppModule {}

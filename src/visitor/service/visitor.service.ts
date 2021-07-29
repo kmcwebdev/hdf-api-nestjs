@@ -4,6 +4,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { Visitor } from '@prisma/client';
+import { CreateSubEmailsDTO } from 'src/common/dto/visitor/create-sub-emails.dto';
 import { CreateVisitorDTO } from 'src/common/dto/visitor/create-visitor.dto';
 import { PrismaClientService } from 'src/prisma-client/prisma-client.service';
 
@@ -31,6 +32,87 @@ export class VisitorService {
     }
 
     return visitor;
+  }
+
+  async checkDuplicateVisit(data: {
+    siteId: number;
+    visitorId: number;
+    isGuest: boolean;
+  }) {
+    const { siteId, visitorId, isGuest } = data;
+
+    const duplicateVisit = await this.prismaClientService.visit.findFirst({
+      where: {
+        AND: [
+          {
+            guest: { equals: isGuest },
+          },
+          {
+            siteId: { equals: siteId },
+          },
+          {
+            visitorId: { equals: visitorId },
+          },
+          {
+            healthTag: { tag: { equals: 'Clear' } },
+          },
+          {
+            dateCreated: { equals: new Date(Date.now()) },
+          },
+        ],
+      },
+      select: {
+        id: true,
+        guest: true,
+        visitor: {
+          select: {
+            id: true,
+            firstName: true,
+            lastName: true,
+            email: true,
+            address: true,
+            company: true,
+          },
+        },
+        visitorStatus: {
+          select: {
+            id: true,
+            status: true,
+            isClear: true,
+            clearedBy: {
+              select: {
+                id: true,
+                email: true,
+                profile: {
+                  select: {
+                    firstName: true,
+                    lastName: true,
+                    phoneNumber: true,
+                  },
+                },
+              },
+            },
+            dateCleared: true,
+            timeCleared: true,
+            dateCreated: true,
+            timeCreated: true,
+          },
+        },
+        poc: true,
+        pocEmail: true,
+        travelLocation: true,
+        site: true,
+        floor: true,
+        healthTag: true,
+        dateCreated: true,
+        timeCreated: true,
+      },
+      orderBy: {
+        id: 'desc',
+      },
+    });
+
+    return duplicateVisit;
   }
 
   async checkVisitorEmail(email: string) {
@@ -100,6 +182,14 @@ export class VisitorService {
 
   async updateVisitor() {
     return true;
+  }
+
+  async createVisitorSubEmails(data: CreateSubEmailsDTO) {
+    const { subEmails } = data;
+
+    return await this.prismaClientService.visitorSubEmail.createMany({
+      data: subEmails,
+    });
   }
 
   async clearVisitor(data: { userId: number; email: string }) {

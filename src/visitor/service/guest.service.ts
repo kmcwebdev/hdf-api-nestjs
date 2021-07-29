@@ -54,75 +54,10 @@ export class GuestService {
       phoneNumber,
     });
 
-    const duplicateVisit = await this.prismaClientService.visit.findFirst({
-      where: {
-        AND: [
-          {
-            guest: { equals: true },
-          },
-          {
-            siteId: { equals: siteId },
-          },
-          {
-            visitorId: { equals: guest.id },
-          },
-          {
-            healthTag: { tag: { equals: 'Clear' } },
-          },
-          {
-            dateCreated: { equals: new Date(Date.now()) },
-          },
-        ],
-      },
-      select: {
-        id: true,
-        guest: true,
-        visitor: {
-          select: {
-            id: true,
-            firstName: true,
-            lastName: true,
-            email: true,
-            address: true,
-            company: true,
-          },
-        },
-        visitorStatus: {
-          select: {
-            id: true,
-            status: true,
-            isClear: true,
-            clearedBy: {
-              select: {
-                id: true,
-                email: true,
-                profile: {
-                  select: {
-                    firstName: true,
-                    lastName: true,
-                    phoneNumber: true,
-                  },
-                },
-              },
-            },
-            dateCleared: true,
-            timeCleared: true,
-            dateCreated: true,
-            timeCreated: true,
-          },
-        },
-        poc: true,
-        pocEmail: true,
-        travelLocation: true,
-        site: true,
-        floor: true,
-        healthTag: true,
-        dateCreated: true,
-        timeCreated: true,
-      },
-      orderBy: {
-        id: 'desc',
-      },
+    const duplicateVisit = await this.visitorService.checkDuplicateVisit({
+      siteId,
+      visitorId: guest.id,
+      isGuest: true,
     });
 
     if (duplicateVisit) {
