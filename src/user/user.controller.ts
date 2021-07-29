@@ -152,21 +152,15 @@ export class UserController {
   @Patch('lock/:id')
   @ApiParam({ name: 'id', description: 'User id' })
   @ApiOkResponse({ description: 'Success' })
-  lockUser(@Req() req: Request, @Param('id', new ParseIntPipe()) id: number) {
-    return this.userService.lockUser({
-      lockUserId: id,
-      lockedById: req.user.id,
-    });
+  lockUser(@Param('id', new ParseIntPipe()) id: number) {
+    return this.userService.lockUser(id);
   }
 
   @Patch('unlock/:id')
   @ApiParam({ name: 'id', description: 'User id' })
   @ApiOkResponse({ description: 'Success' })
-  unLockUser(@Req() req: Request, @Param('id', new ParseIntPipe()) id: number) {
-    return this.userService.unlockUser({
-      lockUserId: id,
-      lockedById: req.user.id,
-    });
+  unLockUser(@Param('id', new ParseIntPipe()) id: number) {
+    return this.userService.unlockUser(id);
   }
 
   @Get(':id')
