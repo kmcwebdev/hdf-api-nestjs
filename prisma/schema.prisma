@@ -22,7 +22,7 @@ model User {
   registeredById               Int?
   registeredBy                 User?           @relation("EncoderToUser", fields: [registeredById], references: [id])
   listOfEncodedAccounts        User[]          @relation("EncoderToUser")
-  passwordResetToken           String?         @unique
+  passwordResetToken           String?         @unique @db.VarChar(255)
   passwordResetTokenExpire     DateTime?
   passwordChangedAt            DateTime?
   emailConfirm                 Boolean         @default(false)
@@ -60,9 +60,9 @@ model Permission {
 model UserProfile {
   id           Int      @id @default(autoincrement())
   user         User?
-  firstName    String
-  lastName     String
-  phoneNumber  String?
+  firstName    String   @db.VarChar(100)
+  lastName     String   @db.VarChar(100)
+  phoneNumber  String?  @db.VarChar(100)
   organization String   @default("KMC Community")
   dateCreated  DateTime @default(now()) @db.Date
   timeCreated  DateTime @default(now()) @db.Time
@@ -73,12 +73,12 @@ model UserProfile {
 model Visitor {
   id                Int             @id @default(autoincrement())
   isBlocked         Boolean         @default(false)
-  firstName         String
-  lastName          String
-  email             String          @unique
-  phoneNumber       String
-  address           String
-  company           String
+  firstName         String          @db.VarChar(100)
+  lastName          String          @db.VarChar(100)
+  email             String          @unique @db.VarChar(100)
+  phoneNumber       String          @db.VarChar(100)
+  address           String          @db.VarChar(100)
+  company           String          @db.VarChar(100)
   clearance         Clearance[]
   tempCheckList     TempCheckList[]
   visitorStatusList VisitorStatus[]
@@ -96,7 +96,7 @@ model VisitorStatus {
   visitor       Visitor   @relation(fields: [visitorId], references: [id], onDelete: Cascade)
   visitId       Int?
   visit         Visit?    @relation(fields: [visitId], references: [id])
-  status        String
+  status        String    @db.VarChar(100)
   isClear       Boolean
   isClearedById Int?
   clearedBy     User?     @relation(fields: [isClearedById], references: [id])
@@ -123,7 +123,7 @@ model VisitorNote {
 
 model TemperatureTag {
   id            Int             @id @default(autoincrement())
-  tag           String          @unique
+  tag           String          @unique @db.VarChar(100)
   tempCheckList TempCheckList[]
 
   @@map("temperature_tags")
@@ -156,8 +156,8 @@ model Visit {
   workType         WorkType?       @relation(fields: [workTypeId], references: [id])
   leaveTypeId      Int?
   leaveType        LeaveType?      @relation(fields: [leaveTypeId], references: [id])
-  poc              String?
-  pocEmail         String?
+  poc              String?         @db.VarChar(100)
+  pocEmail         String?         @db.VarChar(100)
   surveys          Survey[]
   travelLocationId Int?
   travelLocation   TravelLocation? @relation(fields: [travelLocationId], references: [id], onDelete: Cascade)
@@ -175,7 +175,7 @@ model Survey {
   visit       Visit    @relation(fields: [visitId], references: [id], onDelete: Cascade)
   questionId  Int
   question    Question @relation(fields: [questionId], references: [id])
-  answers     String[]
+  answers     String[] @db.VarChar(100)
   dateCreated DateTime @default(now()) @db.Date
   timeCreated DateTime @default(now()) @db.Timestamptz
 
@@ -186,7 +186,7 @@ model Clearance {
   id           Int      @id @default(autoincrement())
   visitorId    Int
   visitor      Visitor  @relation(fields: [visitorId], references: [id], onDelete: Cascade)
-  clearanceUrl String?
+  clearanceUrl String?  @db.VarChar(255)
   uploadedById Int
   uploadedBy   User     @relation(fields: [uploadedById], references: [id])
   notes        String
@@ -198,7 +198,7 @@ model Clearance {
 
 model WorkType {
   id     Int     @id @default(autoincrement())
-  type   String  @unique
+  type   String  @unique @db.VarChar(100)
   visits Visit[]
 
   @@map("work_types")
@@ -206,7 +206,7 @@ model WorkType {
 
 model LeaveType {
   id     Int     @id @default(autoincrement())
-  type   String  @unique
+  type   String  @unique @db.VarChar(100)
   visits Visit[]
 
   @@map("leave_types")
