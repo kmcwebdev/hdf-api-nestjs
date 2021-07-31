@@ -31,12 +31,12 @@ import { PTUpdateProfileDTO, UpdateProfileDTO } from './dto/update-profile.dto';
 import { UpdateUserPermissionDTO } from './dto/update-user-permission.dto';
 import { UserService } from './user.service';
 
-@ApiTags('User')
 @Controller('users')
 @UseGuards(JwtAuthGuard)
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
+  @ApiTags('User')
   @Get()
   @ApiQuery({ type: PTUserQuery, required: false })
   @ApiOkResponse({ description: 'Success' })
@@ -44,18 +44,43 @@ export class UserController {
     return this.userService.getUsers(query);
   }
 
+  @ApiTags('User')
   @Get('me')
   @ApiOkResponse({ description: 'Success' })
   getMe(@Req() req: Request) {
     return this.userService.getUser(req.user.id);
   }
 
+  @ApiTags('Registration')
+  @Post('internal')
+  @ApiBody({ type: InternalRegisterDTO })
+  @ApiCreatedResponse({ description: 'Created' })
+  registerInternalUser(@Req() req: Request, @Body() data: InternalRegisterDTO) {
+    return this.userService.registerInternalUser({
+      userId: req.user.id,
+      payload: data,
+    });
+  }
+
+  @ApiTags('Registration')
+  @Post('external')
+  @ApiBody({ type: ExternalRegisterDTO })
+  @ApiCreatedResponse({ description: 'Created' })
+  registerExternalUser(@Req() req: Request, @Body() data: ExternalRegisterDTO) {
+    return this.userService.registerExternalUser({
+      userId: req.user.id,
+      payload: data,
+    });
+  }
+
+  @ApiTags('Permission')
   @Get('permissions')
   @ApiOkResponse({ description: 'Success' })
   getUserPermissions() {
     return this.userService.getUserPermissions();
   }
 
+  @ApiTags('Permission')
   @Patch('permissions/:id')
   @ApiParam({ name: 'id', description: 'User id' })
   @ApiBody({ type: UpdateUserPermissionDTO })
@@ -72,6 +97,7 @@ export class UserController {
     });
   }
 
+  @ApiTags('Permission')
   @Delete('permissions/:id')
   @ApiParam({ name: 'id', description: 'User id' })
   @ApiBody({ type: UpdateUserPermissionDTO })
@@ -88,26 +114,7 @@ export class UserController {
     });
   }
 
-  @Post('internal')
-  @ApiBody({ type: InternalRegisterDTO })
-  @ApiCreatedResponse({ description: 'Created' })
-  registerInternalUser(@Req() req: Request, @Body() data: InternalRegisterDTO) {
-    return this.userService.registerInternalUser({
-      userId: req.user.id,
-      payload: data,
-    });
-  }
-
-  @Post('external')
-  @ApiBody({ type: ExternalRegisterDTO })
-  @ApiCreatedResponse({ description: 'Created' })
-  registerExternalUser(@Req() req: Request, @Body() data: ExternalRegisterDTO) {
-    return this.userService.registerExternalUser({
-      userId: req.user.id,
-      payload: data,
-    });
-  }
-
+  @ApiTags('User')
   @Get('internal-duplication')
   @ApiQuery({ type: EmailQuery })
   @ApiOkResponse({ description: 'Success' })
@@ -118,6 +125,7 @@ export class UserController {
     return this.userService.checkInternalUserDuplication(email);
   }
 
+  @ApiTags('User')
   @Get('external-duplication')
   @ApiQuery({ type: EmailQuery })
   @ApiOkResponse({ description: 'Success' })
@@ -128,6 +136,7 @@ export class UserController {
     return this.userService.checkExternalUserDuplication(email);
   }
 
+  @ApiTags('User')
   @Patch('profile/:id?')
   @ApiParam({
     name: 'id',
@@ -146,6 +155,7 @@ export class UserController {
     return this.userService.updateProfile({ id, payload: data });
   }
 
+  @ApiTags('User')
   @Patch('lock/:id')
   @ApiParam({ name: 'id', description: 'User id' })
   @ApiOkResponse({ description: 'Success' })
@@ -153,6 +163,7 @@ export class UserController {
     return this.userService.lockUser(id);
   }
 
+  @ApiTags('User')
   @Patch('unlock/:id')
   @ApiParam({ name: 'id', description: 'User id' })
   @ApiOkResponse({ description: 'Success' })
@@ -160,6 +171,7 @@ export class UserController {
     return this.userService.unlockUser(id);
   }
 
+  @ApiTags('User')
   @Get(':id')
   @ApiParam({ name: 'id', description: 'User id' })
   @ApiOkResponse({ description: 'Success' })
