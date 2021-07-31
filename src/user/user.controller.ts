@@ -23,15 +23,12 @@ import {
 } from '@nestjs/swagger';
 import { Request } from 'express';
 import { JwtAuthGuard } from 'src/auth/guard/jwt.guard';
-import { ExternalRegisterDTO } from 'src/common/dto/user/external-register.dto';
-import { InternalRegisterDTO } from 'src/common/dto/user/internal-register.dto';
-import {
-  PTUpdateProfileDTO,
-  UpdateProfileDTO,
-} from 'src/common/dto/user/update-profile.dto';
-import { UpdateUserPermissionDTO } from 'src/common/dto/user/update-user-permission.dto';
-import { EmailQuery } from 'src/common/query/email.query';
-import { PTUserQuery } from 'src/common/query/user/user.query';
+import { ExternalRegisterDTO } from 'src/user/dto/external-register.dto';
+import { EmailQuery } from 'src/user/query/email.query';
+import { PTUserQuery } from 'src/user/query/user.query';
+import { InternalRegisterDTO } from './dto/internal-register.dto';
+import { PTUpdateProfileDTO, UpdateProfileDTO } from './dto/update-profile.dto';
+import { UpdateUserPermissionDTO } from './dto/update-user-permission.dto';
 import { UserService } from './user.service';
 
 @ApiTags('User')

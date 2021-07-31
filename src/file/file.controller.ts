@@ -24,9 +24,9 @@ import {
 } from '@nestjs/swagger';
 import { Request } from 'express';
 import { JwtAuthGuard } from 'src/auth/guard/jwt.guard';
-import { S3DeleteFileDTO } from 'src/common/dto/file/delete-file.dto';
-import { FileUploadDTO } from 'src/common/dto/file/file-upload.dto';
-import { S3PresignedFileUrlDTO } from 'src/common/dto/file/pre-signed-file-url.dto';
+import { S3DeleteFileDTO } from 'src/file/dto/delete-file.dto';
+import { FileUploadDTO } from './dto/file-upload.dto';
+import { S3PresignedFileUrlDTO } from './dto/pre-signed-file-url.dto';
 import { FileService } from './file.service';
 
 @ApiTags('File')

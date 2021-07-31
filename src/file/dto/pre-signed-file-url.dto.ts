@@ -7,7 +7,7 @@ import {
   IsOptional,
   IsString,
 } from 'class-validator';
-import { FileOperation } from 'src/common/enum/file/file-operation.enum';
+import { FileOperation } from '../enum/file-operation.enum';
 
 export class S3PresignedFileUrlDTO {
   @ApiProperty()

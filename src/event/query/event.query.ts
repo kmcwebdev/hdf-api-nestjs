@@ -6,7 +6,7 @@ import {
   IsOptional,
   IsString,
 } from 'class-validator';
-import { PaginationQuery } from '../pagination.query';
+import { PaginationQuery } from '../../common/query/pagination.query';
 
 export class PTEventQuery extends PartialType(PaginationQuery) {
   @ApiProperty()

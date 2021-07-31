@@ -4,9 +4,9 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { Visitor } from '@prisma/client';
-import { CreateSubEmailsDTO } from 'src/common/dto/visitor/create-sub-emails.dto';
-import { CreateVisitorDTO } from 'src/common/dto/visitor/create-visitor.dto';
 import { PrismaClientService } from 'src/prisma-client/prisma-client.service';
+import { CreateSubEmailsDTO } from 'src/visitor/dto/visitor/create-sub-emails.dto';
+import { CreateVisitorDTO } from 'src/visitor/dto/visitor/create-visitor.dto';
 
 @Injectable()
 export class VisitorService {

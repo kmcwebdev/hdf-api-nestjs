@@ -11,8 +11,8 @@ import {
   Validate,
 } from 'class-validator';
 import { IsBeforeConstraint } from 'src/common/decorator/constraint-validator.decorator';
-import { UserType } from 'src/common/enum/user/user-type.enum';
-import { PaginationQuery } from '../pagination.query';
+import { UserType } from 'src/user/enum/user-type.enum';
+import { PaginationQuery } from '../../common/query/pagination.query';
 
 export class PTUserQuery extends PartialType(PaginationQuery) {
   @ApiProperty()

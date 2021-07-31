@@ -19,12 +19,12 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { Request, Response } from 'express';
-import { cookie } from 'src/common/config/cokie.config';
-import { ChangePasswordDTO } from 'src/common/dto/auth/change-password.dto';
-import { ForgotPasswordDTO } from 'src/common/dto/auth/forgot-password.dto';
-import { LoginDTO } from 'src/common/dto/auth/login.dto';
-import { ResetTokenDTO } from 'src/common/dto/auth/reset-token.dto';
+import { ChangePasswordDTO } from 'src/auth/dto/change-password.dto';
+import { cookie } from 'src/common/config/cookie.config';
 import { AuthService } from './auth.service';
+import { ForgotPasswordDTO } from './dto/forgot-password.dto';
+import { LoginDTO } from './dto/login.dto';
+import { ResetTokenDTO } from './dto/reset-token.dto';
 import { JwtAuthGuard } from './guard/jwt.guard';
 import { LocalAuthGuard } from './guard/local-auth.guard';
 

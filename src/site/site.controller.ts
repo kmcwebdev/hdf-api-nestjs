@@ -8,7 +8,7 @@ import {
 } from '@nestjs/common';
 import { ApiOkResponse, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { JwtAuthGuard } from 'src/auth/guard/jwt.guard';
-import { SiteTotalRecordCountDTO } from 'src/common/dto/site/site-total-record-count.dto';
+import { SiteTotalRecordCountDTO } from 'src/site/dto/site-total-record-count.dto';
 import { SiteService } from './site.service';
 
 @ApiTags('Site')

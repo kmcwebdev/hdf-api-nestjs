@@ -1,8 +1,8 @@
 import { HttpModule } from '@nestjs/axios';
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { AzureGraphApiController } from './azure-graph-api.controller';
-import { AzureGraphApiService } from './azure-graph-api.service';
+import { AzureGraphController } from './azure-graph.controller';
+import { AzureGraphService } from './azure-graph.service';
 
 @Module({
   imports: [
@@ -19,8 +19,8 @@ import { AzureGraphApiService } from './azure-graph-api.service';
       inject: [ConfigService],
     }),
   ],
-  controllers: [AzureGraphApiController],
-  providers: [AzureGraphApiService],
-  exports: [AzureGraphApiService],
+  controllers: [AzureGraphController],
+  providers: [AzureGraphService],
+  exports: [AzureGraphService],
 })
-export class AzureGraphApiModule {}
+export class AzureGraphModule {}

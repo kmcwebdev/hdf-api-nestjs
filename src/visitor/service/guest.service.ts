@@ -1,7 +1,7 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
-import { CreateGuestVisitorDTO } from 'src/common/dto/visitor/guest/create-guest-visitor.dto';
 import { mailDomainIs } from 'src/common/utils/email-domain-check.util';
 import { PrismaClientService } from 'src/prisma-client/prisma-client.service';
+import { CreateGuestVisitorDTO } from 'src/visitor/dto/visitor/guest/create-guest-visitor.dto';
 import { VisitorService } from './visitor.service';
 
 @Injectable()

@@ -4,24 +4,24 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { firstValueFrom } from 'rxjs';
-import { AzureGraphApiService } from 'src/azure-graph-api/azure-graph-api.service';
-import { ExternalRegisterDTO } from 'src/common/dto/user/external-register.dto';
-import { InternalRegisterDTO } from 'src/common/dto/user/internal-register.dto';
-import { PTUpdateProfileDTO } from 'src/common/dto/user/update-profile.dto';
-import { UpdateUserPermissionDTO } from 'src/common/dto/user/update-user-permission.dto';
-import { UserType } from 'src/common/enum/user/user-type.enum';
-import { GraphUser } from 'src/common/interface/azure-graph/get-user.interface';
-import { PTUserQuery } from 'src/common/query/user/user.query';
+import { AzureGraphService } from 'src/azure-graph/azure-graph.service';
+import { GraphUser } from 'src/azure-graph/interface/get-user.interface';
 import { mailDomainIs } from 'src/common/utils/email-domain-check.util';
 import { hashPassword } from 'src/common/utils/hashed-password.util';
 import { paginate } from 'src/common/utils/paginate.util';
 import { PrismaClientService } from 'src/prisma-client/prisma-client.service';
+import { ExternalRegisterDTO } from 'src/user/dto/external-register.dto';
+import { UserType } from 'src/user/enum/user-type.enum';
+import { PTUserQuery } from 'src/user/query/user.query';
+import { InternalRegisterDTO } from './dto/internal-register.dto';
+import { PTUpdateProfileDTO } from './dto/update-profile.dto';
+import { UpdateUserPermissionDTO } from './dto/update-user-permission.dto';
 
 @Injectable()
 export class UserService {
   constructor(
     private prismaClientService: PrismaClientService,
-    private azureGraphService: AzureGraphApiService,
+    private azureGraphService: AzureGraphService,
   ) {}
 
   async getUsers(query: PTUserQuery) {

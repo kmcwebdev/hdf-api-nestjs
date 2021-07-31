@@ -3,7 +3,7 @@ import { HttpException, Injectable } from '@nestjs/common';
 import { catchError, map } from 'rxjs/operators';
 
 @Injectable()
-export class AzureGraphApiService {
+export class AzureGraphService {
   constructor(private httpService: HttpService) {}
 
   getEmailDetails(value: string) {

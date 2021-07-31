@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
-import { CreateEventDTO } from 'src/common/dto/event/create-event.dto';
-import { PTEventQuery } from 'src/common/query/event/event.query';
 import { paginate } from 'src/common/utils/paginate.util';
+import { CreateEventDTO } from 'src/event/dto/create-event.dto';
+import { PTEventQuery } from 'src/event/query/event.query';
 import { PrismaClientService } from 'src/prisma-client/prisma-client.service';
 
 @Injectable()

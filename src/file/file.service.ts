@@ -13,11 +13,11 @@ import * as mime from 'mime-types';
 import { InjectS3, S3 } from 'nestjs-s3';
 import * as path from 'path';
 import slugify from 'slugify';
-import { FileUploadDTO } from 'src/common/dto/file/file-upload.dto';
-import { S3PresignedFileUrlDTO } from 'src/common/dto/file/pre-signed-file-url.dto';
-import { FileACL } from 'src/common/enum/file/file-acl.enum';
-import { FileOperation } from 'src/common/enum/file/file-operation.enum';
+import { FileACL } from 'src/file/enum/file-acl.enum';
 import tinify from 'tinify';
+import { FileUploadDTO } from './dto/file-upload.dto';
+import { S3PresignedFileUrlDTO } from './dto/pre-signed-file-url.dto';
+import { FileOperation } from './enum/file-operation.enum';
 
 @Injectable()
 export class FileService {

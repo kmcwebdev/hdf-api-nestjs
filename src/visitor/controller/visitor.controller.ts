@@ -17,8 +17,8 @@ import {
 } from '@nestjs/swagger';
 import { Request } from 'express';
 import { JwtAuthGuard } from 'src/auth/guard/jwt.guard';
-import { CreateSubEmailsDTO } from 'src/common/dto/visitor/create-sub-emails.dto';
-import { EmailQuery } from 'src/common/query/email.query';
+import { EmailQuery } from 'src/user/query/email.query';
+import { CreateSubEmailsDTO } from 'src/visitor/dto/visitor/create-sub-emails.dto';
 import { VisitorService } from '../service/visitor.service';
 
 @ApiTags('Visitor')

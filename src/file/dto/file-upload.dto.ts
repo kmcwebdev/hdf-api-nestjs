@@ -7,7 +7,7 @@ import {
   IsOptional,
   IsString,
 } from 'class-validator';
-import { FileACL } from 'src/common/enum/file/file-acl.enum';
+import { FileACL } from 'src/file/enum/file-acl.enum';
 
 export class FileUploadDTO {
   @ApiProperty()

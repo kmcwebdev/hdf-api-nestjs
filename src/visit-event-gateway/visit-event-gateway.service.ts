@@ -7,7 +7,7 @@ import {
 } from '@nestjs/websockets';
 import { from, map, Observable } from 'rxjs';
 import { Socket } from 'socket.io';
-import { EventVisitGatewayIDTO } from 'src/common/interface/event-visit-gateway/event-visit-gateway.interface';
+import { EventVisitGatewayIDTO } from 'src/visit-event-gateway/interface/event-visit-gateway.interface';
 
 @WebSocketGateway()
 export class VisitEventGateway {

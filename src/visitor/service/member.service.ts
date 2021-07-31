@@ -1,6 +1,6 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
-import { CreateMemberVisitorDTO } from 'src/common/dto/visitor/member/create-member-visit.dto';
 import { PrismaClientService } from 'src/prisma-client/prisma-client.service';
+import { CreateMemberVisitorDTO } from 'src/visitor/dto/visitor/member/create-member-visit.dto';
 import { VisitorService } from './visitor.service';
 
 @Injectable()
