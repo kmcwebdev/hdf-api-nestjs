@@ -4,7 +4,6 @@ import { NestExpressApplication } from '@nestjs/platform-express';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import * as compression from 'compression';
 import * as cookieParser from 'cookie-parser';
-import * as basicAuth from 'express-basic-auth';
 import * as helmet from 'helmet';
 import * as hpp from 'hpp';
 import * as xss from 'xss-clean';
@@ -46,16 +45,6 @@ async function bootstrap() {
   app.use(helmet());
   app.use(xss());
   app.use(compression());
-
-  app.use(
-    ['/docs'],
-    basicAuth({
-      challenge: true,
-      users: {
-        admin: 'Love2eat',
-      },
-    }),
-  );
 
   const config = new DocumentBuilder()
     .setTitle('MDF API')
