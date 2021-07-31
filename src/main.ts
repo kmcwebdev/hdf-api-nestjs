@@ -47,7 +47,7 @@ async function bootstrap() {
   app.use(compression());
 
   const config = new DocumentBuilder()
-    .setTitle('MDF API')
+    .setTitle('HDF API')
     .setVersion('1.0')
     .build();
 
