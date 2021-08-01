@@ -18,7 +18,6 @@ async function bootstrap() {
 
   app.useGlobalFilters(new HttpExceptionFilter());
   app.useGlobalFilters(new PrismaExceptionFilter());
-
   app.useGlobalInterceptors(new TransformInterceptor());
 
   // Cause we are using DigitalOcean app platform this will
