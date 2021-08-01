@@ -8,6 +8,7 @@ import authEnv from './common/config/auth.config';
 import erpEnv from './common/config/erp.config';
 import s3Env from './common/config/s3.config';
 import sendgridEnv from './common/config/sengrid.config';
+import tinifyEnv from './common/config/tinify.config';
 import { EventModule } from './event/event.module';
 import { FileModule } from './file/file.module';
 import { PrismaClientModule } from './prisma-client/prisma-client.module';
@@ -21,7 +22,7 @@ import { VisitorModule } from './visitor/visitor.module';
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
-      load: [authEnv, erpEnv, s3Env, sendgridEnv],
+      load: [authEnv, erpEnv, s3Env, sendgridEnv, tinifyEnv],
     }),
     SendGridModule.forRootAsync({
       imports: [ConfigModule],
