@@ -1,5 +1,6 @@
 import { HttpService } from '@nestjs/axios';
 import { HttpException, Injectable } from '@nestjs/common';
+import { Cron, CronExpression } from '@nestjs/schedule';
 import { firstValueFrom, Observable } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
 import { PrismaClientService } from 'src/prisma-client/prisma-client.service';
@@ -35,33 +36,6 @@ export class SiteService {
     );
   }
 
-  async syncSite(totalRecordCount: number) {
-    const sites = this.erpSites<{
-      data: [{ buildingID: number; name: string }];
-    }>(totalRecordCount);
-
-    const { data } = await firstValueFrom(sites);
-
-    data.forEach(async (data: { buildingID: number; name: string }) => {
-      await this.prismaClientService.site.upsert({
-        create: {
-          siteId: data.buildingID,
-          siteName: data.name.toUpperCase(),
-        },
-        update: {
-          siteName: data.name.toUpperCase(),
-        },
-        where: { siteId: data.buildingID },
-      });
-    });
-
-    return {
-      message: 'Sync successfull',
-      dateTime: new Date(),
-      httpCode: 200,
-    };
-  }
-
   async syncFloorToSites() {
     const erpSiteFloors = this.erpSiteFloors<{
       floors: [{ floorID: number; name: string; buildingID: number }];
@@ -85,9 +59,33 @@ export class SiteService {
         });
       },
     );
+  }
+
+  @Cron(CronExpression.EVERY_WEEK)
+  async syncSite(totalRecordCount: number) {
+    const sites = this.erpSites<{
+      data: [{ buildingID: number; name: string }];
+    }>(totalRecordCount);
+
+    const { data } = await firstValueFrom(sites);
+
+    data.forEach(async (data: { buildingID: number; name: string }) => {
+      await this.prismaClientService.site.upsert({
+        create: {
+          siteId: data.buildingID,
+          siteName: data.name.toUpperCase(),
+        },
+        update: {
+          siteName: data.name.toUpperCase(),
+        },
+        where: { siteId: data.buildingID },
+      });
+    });
+
+    await this.syncFloorToSites();
 
     return {
-      message: 'Sync successfull',
+      message: 'Sync successfully',
       dateTime: new Date(),
       httpCode: 200,
     };

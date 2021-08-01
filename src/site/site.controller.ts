@@ -30,12 +30,4 @@ export class SiteController {
   syncSite(@Query() { totalRecordCount }: SiteTotalRecordCountDTO) {
     return this.siteService.syncSite(totalRecordCount);
   }
-
-  @Post('floors/sync')
-  @UseGuards(JwtAuthGuard)
-  @HttpCode(200)
-  @ApiOkResponse({ description: 'Success' })
-  syncFloorToSites() {
-    return this.siteService.syncFloorToSites();
-  }
 }
