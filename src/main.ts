@@ -20,8 +20,6 @@ async function bootstrap() {
   app.useGlobalFilters(new PrismaExceptionFilter());
   app.useGlobalInterceptors(new TransformInterceptor());
 
-  // Cause we are using DigitalOcean app platform this will
-  // be supplied by the http-route settings on deployment.
   if (process.env.NODE_ENV === 'development') {
     app.setGlobalPrefix('api');
   }
