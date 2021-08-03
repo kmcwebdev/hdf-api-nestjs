@@ -25,12 +25,11 @@ export class GuestService {
       floorId,
       poc,
       pocEmail,
+      purposeOfVisit,
     } = data;
 
     if (mailDomainIs(email, 'kmc.solutions')) {
-      throw new BadRequestException(
-        'Email domain is not valid for guest declaration',
-      );
+      throw new BadRequestException('Please use the member declaration form.');
     }
 
     const oldVisitStatus =
@@ -84,6 +83,7 @@ export class GuestService {
         floor: { connect: { floorId } },
         poc,
         pocEmail,
+        purposeOfVisit,
         healthTag: { connect: { id: healthTag.id } },
       },
     });

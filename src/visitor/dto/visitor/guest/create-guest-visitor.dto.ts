@@ -73,4 +73,9 @@ export class CreateGuestVisitorDTO {
   @ApiProperty()
   @IsEmail()
   readonly pocEmail: string;
+
+  @ApiProperty()
+  @IsNotEmpty()
+  @IsString()
+  readonly purposeOfVisit: string;
 }

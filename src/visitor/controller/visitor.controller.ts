@@ -2,6 +2,7 @@ import {
   Body,
   Controller,
   Get,
+  HttpCode,
   Patch,
   Post,
   Query,
@@ -26,7 +27,8 @@ import { VisitorService } from '../service/visitor.service';
 export class VisitorController {
   constructor(private visitorService: VisitorService) {}
 
-  @Get('check-email')
+  @Post('check-email')
+  @HttpCode(200)
   @ApiQuery({ type: EmailQuery })
   @ApiOkResponse({ description: 'Success' })
   checkVisitorEmail(@Query() { email }: EmailQuery) {

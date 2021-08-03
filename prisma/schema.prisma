@@ -165,6 +165,7 @@ model Visit {
   leaveType        LeaveType?      @relation(fields: [leaveTypeId], references: [id])
   poc              String?         @db.VarChar(100)
   pocEmail         String?         @db.VarChar(100)
+  purposeOfVisit   String?
   surveys          Survey[]
   travelLocationId Int?
   travelLocation   TravelLocation? @relation(fields: [travelLocationId], references: [id], onDelete: Cascade)

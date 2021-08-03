@@ -2,6 +2,7 @@ import {
   Controller,
   Get,
   HttpCode,
+  ParseIntPipe,
   Post,
   Query,
   UseGuards,
@@ -20,6 +21,13 @@ export class SiteController {
   @ApiOkResponse({ description: 'Success' })
   getSites() {
     return this.siteService.getSites();
+  }
+
+  @Get('floors')
+  @ApiQuery({ name: 'siteId' })
+  @ApiOkResponse({ description: 'Success' })
+  getFloors(@Query('siteId', ParseIntPipe) siteId: number) {
+    return this.siteService.getFloors(siteId);
   }
 
   @Post('sync')

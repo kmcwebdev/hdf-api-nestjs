@@ -93,8 +93,15 @@ export class SiteService {
 
   async getSites() {
     return await this.prismaClientService.site.findMany({
-      include: { floors: true },
       orderBy: { siteId: 'asc' },
+    });
+  }
+
+  async getFloors(siteId: number) {
+    return await this.prismaClientService.floor.findMany({
+      where: { sites: { some: { siteId } } },
+      select: { floorId: true, floor: true },
+      orderBy: { floorId: 'asc' },
     });
   }
 }
