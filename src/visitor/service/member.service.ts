@@ -18,7 +18,7 @@ export class MemberService {
       phoneNumber,
       company,
       address,
-      city,
+      travelLocations,
       questions,
       siteId,
       floorId,
@@ -71,17 +71,12 @@ export class MemberService {
       data: {
         guest: false,
         visitor: { connect: { id: member.id } },
+        travelLocations: [travelLocations],
         site: { connect: { siteId } },
         floor: { connect: { floorId } },
         healthTag: { connect: { id: healthTag.id } },
       },
     });
-
-    if (city) {
-      await this.prismaClientService.travelLocation.create({
-        data: { city, visit: { connect: { id: visit.id } } },
-      });
-    }
 
     questions.forEach(async (question) => {
       await this.prismaClientService.survey.create({
@@ -141,7 +136,7 @@ export class MemberService {
             timeCreated: true,
           },
         },
-        travelLocation: true,
+        travelLocations: true,
         site: true,
         floor: true,
         healthTag: true,

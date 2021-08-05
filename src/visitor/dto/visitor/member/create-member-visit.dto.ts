@@ -46,7 +46,7 @@ export class CreateMemberVisitorDTO {
   @IsOptional()
   @IsNotEmpty()
   @IsString()
-  readonly city: string;
+  readonly travelLocations: string;
 
   @ApiProperty({ type: [QuestionDTO] })
   @IsArray()

@@ -122,7 +122,7 @@ export class VisitorService {
         },
         poc: true,
         pocEmail: true,
-        travelLocation: true,
+        travelLocations: true,
         site: true,
         floor: true,
         healthTag: true,

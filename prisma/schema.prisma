@@ -151,29 +151,28 @@ model TempCheckList {
 }
 
 model Visit {
-  id               Int             @id @default(autoincrement())
-  guest            Boolean
-  visitorId        Int
-  visitor          Visitor         @relation(fields: [visitorId], references: [id], onDelete: Cascade)
-  visitorStatus    VisitorStatus?
-  siteId           Int
-  site             Site            @relation(fields: [siteId], references: [siteId])
-  floorId          Int
-  floor            Floor           @relation(fields: [floorId], references: [floorId])
-  workTypeId       Int?
-  workType         WorkType?       @relation(fields: [workTypeId], references: [id])
-  leaveTypeId      Int?
-  leaveType        LeaveType?      @relation(fields: [leaveTypeId], references: [id])
-  poc              String?         @db.VarChar(100)
-  pocEmail         String?         @db.VarChar(100)
-  purposeOfVisit   String?
-  surveys          Survey[]
-  travelLocationId Int?
-  travelLocation   TravelLocation? @relation(fields: [travelLocationId], references: [id], onDelete: Cascade)
-  healthTagId      Int
-  healthTag        HealthTag       @relation(fields: [healthTagId], references: [id])
-  dateCreated      DateTime        @default(now()) @db.Date
-  timeCreated      DateTime        @default(now()) @db.Timestamptz
+  id              Int            @id @default(autoincrement())
+  guest           Boolean
+  visitorId       Int
+  visitor         Visitor        @relation(fields: [visitorId], references: [id], onDelete: Cascade)
+  visitorStatus   VisitorStatus?
+  siteId          Int
+  site            Site           @relation(fields: [siteId], references: [siteId])
+  floorId         Int
+  floor           Floor          @relation(fields: [floorId], references: [floorId])
+  workTypeId      Int?
+  workType        WorkType?      @relation(fields: [workTypeId], references: [id])
+  leaveTypeId     Int?
+  leaveType       LeaveType?     @relation(fields: [leaveTypeId], references: [id])
+  poc             String?        @db.VarChar(100)
+  pocEmail        String?        @db.VarChar(100)
+  purposeOfVisit  String?
+  surveys         Survey[]
+  travelLocations String[]
+  healthTagId     Int
+  healthTag       HealthTag      @relation(fields: [healthTagId], references: [id])
+  dateCreated     DateTime       @default(now()) @db.Date
+  timeCreated     DateTime       @default(now()) @db.Timestamptz
 
   @@map("visits")
 }
@@ -247,16 +246,6 @@ model Answer {
   questions Question[]
 
   @@map("answers")
-}
-
-model TravelLocation {
-  id          Int      @id @default(autoincrement())
-  city        String
-  visit       Visit?
-  dateCreated DateTime @default(now()) @db.Date
-  timeCreated DateTime @default(now()) @db.Timestamptz
-
-  @@map("travel_locations")
 }
 
 model Event {
