@@ -48,6 +48,17 @@ export class CreateMemberVisitorDTO {
   @IsString()
   readonly travelLocations: string;
 
+  @ApiProperty()
+  @IsInt()
+  @Type(() => Number)
+  readonly workTypeId: number;
+
+  @ApiProperty()
+  @IsOptional()
+  @IsInt()
+  @Type(() => Number)
+  readonly leaveTypeId: number;
+
   @ApiProperty({ type: [QuestionDTO] })
   @IsArray()
   @ArrayMinSize(4)
@@ -56,11 +67,13 @@ export class CreateMemberVisitorDTO {
   readonly questions: QuestionDTO[];
 
   @ApiProperty()
+  @IsOptional()
   @IsInt()
   @Type(() => Number)
   readonly siteId: number;
 
   @ApiProperty()
+  @IsOptional()
   @IsInt()
   @Type(() => Number)
   readonly floorId: number;

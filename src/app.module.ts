@@ -13,6 +13,7 @@ import tinifyEnv from './common/config/tinify.config';
 import { EventModule } from './event/event.module';
 import { FileModule } from './file/file.module';
 import { MailModule } from './mail/mail.module';
+import { MiscModule } from './misc/misc.module';
 import { PrismaClientModule } from './prisma-client/prisma-client.module';
 import { QuestionModule } from './question/question.module';
 import { SiteModule } from './site/site.module';
@@ -49,6 +50,7 @@ import { VisitorModule } from './visitor/visitor.module';
     EventModule,
     SiteModule,
     FileModule,
+    MiscModule,
     MailModule,
     VisitEventGatewayModule,
   ],

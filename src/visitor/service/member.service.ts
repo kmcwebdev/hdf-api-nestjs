@@ -1,4 +1,5 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
+import { Visit } from '@prisma/client';
 import { PrismaClientService } from 'src/prisma-client/prisma-client.service';
 import { CreateMemberVisitorDTO } from 'src/visitor/dto/visitor/member/create-member-visit.dto';
 import { VisitorService } from './visitor.service';
@@ -18,6 +19,8 @@ export class MemberService {
       phoneNumber,
       company,
       address,
+      workTypeId,
+      leaveTypeId,
       travelLocations,
       questions,
       siteId,
@@ -33,6 +36,13 @@ export class MemberService {
     if (oldVisitStatus?.isClear === false) {
       throw new BadRequestException(
         'Sorry you are not yet cleared by the admin',
+      );
+    }
+
+    // Manual!!!
+    if (leaveTypeId && workTypeId !== 3) {
+      throw new BadRequestException(
+        'Failed to connect work type to leave type.',
       );
     }
 
@@ -67,16 +77,36 @@ export class MemberService {
       where: { id: memberIsClearOfAnySymptoms ? 2 : 1 },
     });
 
-    const visit = await this.prismaClientService.visit.create({
-      data: {
-        guest: false,
-        visitor: { connect: { id: member.id } },
-        travelLocations: [travelLocations],
-        site: { connect: { siteId } },
-        floor: { connect: { floorId } },
-        healthTag: { connect: { id: healthTag.id } },
-      },
-    });
+    let visit: Visit;
+
+    if (leaveTypeId) {
+      visit = await this.prismaClientService.visit.create({
+        data: {
+          guest: false,
+          visitor: { connect: { id: member.id } },
+          workType: { connect: { id: workTypeId } },
+          leaveType: { connect: { id: leaveTypeId } },
+          travelLocations: [travelLocations],
+          site: { connect: { siteId } },
+          floor: { connect: { floorId } },
+          healthTag: { connect: { id: healthTag.id } },
+        },
+      });
+    }
+
+    if (!leaveTypeId) {
+      visit = await this.prismaClientService.visit.create({
+        data: {
+          guest: false,
+          visitor: { connect: { id: member.id } },
+          workType: { connect: { id: workTypeId } },
+          travelLocations: [travelLocations],
+          site: { connect: { siteId } },
+          floor: { connect: { floorId } },
+          healthTag: { connect: { id: healthTag.id } },
+        },
+      });
+    }
 
     questions.forEach(async (question) => {
       await this.prismaClientService.survey.create({
@@ -136,6 +166,8 @@ export class MemberService {
             timeCreated: true,
           },
         },
+        workType: true,
+        leaveType: leaveTypeId ? true : false,
         travelLocations: true,
         site: true,
         floor: true,
