@@ -156,10 +156,10 @@ model Visit {
   visitorId       Int
   visitor         Visitor        @relation(fields: [visitorId], references: [id], onDelete: Cascade)
   visitorStatus   VisitorStatus?
-  siteId          Int
-  site            Site           @relation(fields: [siteId], references: [siteId])
-  floorId         Int
-  floor           Floor          @relation(fields: [floorId], references: [floorId])
+  siteId          Int?
+  site            Site?          @relation(fields: [siteId], references: [siteId])
+  floorId         Int?
+  floor           Floor?         @relation(fields: [floorId], references: [floorId])
   workTypeId      Int?
   workType        WorkType?      @relation(fields: [workTypeId], references: [id])
   leaveTypeId     Int?
@@ -205,9 +205,10 @@ model Clearance {
 }
 
 model WorkType {
-  id     Int     @id @default(autoincrement())
-  type   String  @unique @db.VarChar(100)
-  visits Visit[]
+  id       Int     @id @default(autoincrement())
+  type     String  @unique @db.VarChar(100)
+  imageUrl String?
+  visits   Visit[]
 
   @@map("work_types")
 }
