@@ -64,23 +64,26 @@ export class SiteService {
   @Cron(CronExpression.EVERY_WEEK)
   async syncSite(totalRecordCount: number) {
     const sites = this.erpSites<{
-      data: [{ buildingID: number; name: string }];
+      data: [{ buildingID: number; name: string; email: string }];
     }>(totalRecordCount);
 
     const { data } = await firstValueFrom(sites);
 
-    data.forEach(async (data: { buildingID: number; name: string }) => {
-      await this.prismaClientService.site.upsert({
-        create: {
-          siteId: data.buildingID,
-          siteName: data.name.toUpperCase(),
-        },
-        update: {
-          siteName: data.name.toUpperCase(),
-        },
-        where: { siteId: data.buildingID },
-      });
-    });
+    data.forEach(
+      async (data: { buildingID: number; name: string; email: string }) => {
+        await this.prismaClientService.site.upsert({
+          create: {
+            siteId: data.buildingID,
+            siteName: data.name.toUpperCase(),
+            siteEmail: data.email,
+          },
+          update: {
+            siteName: data.name.toUpperCase(),
+          },
+          where: { siteId: data.buildingID },
+        });
+      },
+    );
 
     await this.syncFloorToSites();
 
