@@ -1,15 +1,38 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
+import { format } from 'date-fns';
 import { mailDomainIs } from 'src/common/utils/email-domain-check.util';
+import { MailService } from 'src/mail/mail.service';
 import { PrismaClientService } from 'src/prisma-client/prisma-client.service';
 import { CreateGuestVisitorDTO } from 'src/visitor/dto/visitor/guest/create-guest-visitor.dto';
 import { VisitorService } from './visitor.service';
 
 @Injectable()
 export class GuestService {
+  private mode: string;
+  private hdGuestApproval: string;
+  private hdNeedsAttention: string;
+
   constructor(
     private prismaClientService: PrismaClientService,
     private visitorService: VisitorService,
-  ) {}
+    private config: ConfigService<{
+      sendGrid: { hdGuestApproval: string; hdNeedsAttention: string };
+      env: { mode: string };
+    }>,
+    private mailService: MailService,
+  ) {
+    this.mode = this.config.get<string>('env.mode', { infer: true });
+    this.hdGuestApproval = this.config.get<string>('sendGrid.hdGuestApproval', {
+      infer: true,
+    });
+    this.hdNeedsAttention = this.config.get<string>(
+      'sendGrid.hdNeedsAttention',
+      {
+        infer: true,
+      },
+    );
+  }
 
   async createGuestVisitor(data: CreateGuestVisitorDTO) {
     const {
@@ -63,16 +86,12 @@ export class GuestService {
       return duplicateVisit;
     }
 
-    const guestIsClearOfAnySymptoms = questions
-      .map(
-        (question) =>
-          question.answers.includes('None of the above') ||
-          question.answers.includes('No'),
-      )
+    const guestNeedsAttention = this.visitorService
+      .isClearOfAnySymptoms(questions)
       .filter((answer) => answer === false).length;
 
     const healthTag = await this.prismaClientService.healthTag.findUnique({
-      where: { id: guestIsClearOfAnySymptoms ? 2 : 1 },
+      where: { id: guestNeedsAttention ? 2 : 1 },
     });
 
     const visit = await this.prismaClientService.visit.create({
@@ -108,12 +127,12 @@ export class GuestService {
       data: {
         visitor: { connect: { id: guest.id } },
         visit: { connect: { id: visit.id } },
-        status: guestIsClearOfAnySymptoms ? 'Denied' : 'Pending for approval',
-        isClear: guestIsClearOfAnySymptoms ? false : true,
+        status: guestNeedsAttention ? 'Denied' : 'Pending for approval',
+        isClear: guestNeedsAttention ? false : true,
       },
     });
 
-    return await this.prismaClientService.visit.findUnique({
+    const guestVisit = await this.prismaClientService.visit.findUnique({
       where: { id: visit.id },
       select: {
         id: true,
@@ -162,5 +181,69 @@ export class GuestService {
         timeCreated: true,
       },
     });
+
+    const { siteName, siteEmail } =
+      await this.prismaClientService.site.findUnique({
+        where: { siteId },
+      });
+
+    const { floor } = await this.prismaClientService.floor.findUnique({
+      where: { floorId },
+    });
+
+    if (!guestNeedsAttention) {
+      await this.mailService.sendEmailWithTemplate({
+        to: mailDomainIs(pocEmail, 'kmc.solutions') ? pocEmail : siteEmail,
+        from: 'no-reply@kmc.solutions',
+        templateId: this.hdGuestApproval,
+        dynamicTemplateData: {
+          dateOfVisit: format(new Date(), 'MMMM dd, yyyy hh:mm a'),
+          firstName,
+          lastName,
+          email,
+          company,
+          personToVisit: poc,
+          site: siteName,
+          floor,
+          status: guestNeedsAttention ? 'Needs attention' : 'Clear',
+          purposeOfVisit,
+          link: 'https://hdf.kmc.solutions',
+        },
+        groupId: 15220,
+        groupsToDisplay: [15220],
+      });
+    }
+
+    if (guestNeedsAttention) {
+      await this.prismaClientService.visitor.update({
+        where: { id: guest.id },
+        data: { isClear: false },
+      });
+
+      await this.mailService.sendEmailWithTemplate({
+        to:
+          this.mode === 'development'
+            ? 'christian.sulit@kmc.solutions'
+            : 'health@kmc.solutions',
+        from: 'no-reply@kmc.solutions',
+        templateId: this.hdNeedsAttention,
+        dynamicTemplateData: {
+          dateOfVisit: format(new Date(), 'MMMM dd, yyyy hh:mm a'),
+          firstName,
+          lastName,
+          email,
+          company,
+          personToVisit: poc,
+          site: siteName,
+          floor,
+          status: guestNeedsAttention ? 'Needs attention' : 'Clear',
+          link: 'https://hdf.kmc.solutions',
+        },
+        groupId: 15220,
+        groupsToDisplay: [15220],
+      });
+    }
+
+    return guestVisit;
   }
 }

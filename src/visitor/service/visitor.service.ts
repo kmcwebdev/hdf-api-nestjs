@@ -3,14 +3,33 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { Visitor } from '@prisma/client';
+import { MailService } from 'src/mail/mail.service';
 import { PrismaClientService } from 'src/prisma-client/prisma-client.service';
 import { CreateSubEmailsDTO } from 'src/visitor/dto/visitor/create-sub-emails.dto';
 import { CreateVisitorDTO } from 'src/visitor/dto/visitor/create-visitor.dto';
+import { QuestionDTO } from '../dto/visitor/question.dto';
 
 @Injectable()
 export class VisitorService {
-  constructor(private prismaClientService: PrismaClientService) {}
+  private dhClearanceStatus: string;
+
+  constructor(
+    private prismaClientService: PrismaClientService,
+    private mailService: MailService,
+    private config: ConfigService<{
+      sendGrid: { dhClearanceStatus: string };
+      env: { mode: string };
+    }>,
+  ) {
+    this.dhClearanceStatus = this.config.get<string>(
+      'sendGrid.dhClearanceStatus',
+      {
+        infer: true,
+      },
+    );
+  }
 
   async getOrCreateVisitor(data: CreateVisitorDTO) {
     const { email } = data;
@@ -57,7 +76,10 @@ export class VisitorService {
             healthTag: { tag: { equals: 'Clear' } },
           },
           {
-            dateCreated: { equals: new Date(Date.now()) },
+            dateCreated: {
+              gte: new Date(Date.now()),
+              lte: new Date(Date.now()),
+            },
           },
         ],
       },
@@ -115,6 +137,15 @@ export class VisitorService {
     return duplicateVisit;
   }
 
+  isClearOfAnySymptoms(questions: QuestionDTO[]) {
+    return questions.map(
+      (question) =>
+        (question.answers.length === 1 &&
+          question.answers[0] === 'None of the above') ||
+        question.answers[0] === 'No',
+    );
+  }
+
   async checkVisitorEmail(email: string) {
     const result = await this.prismaClientService.visitor.findUnique({
       where: { email },
@@ -122,6 +153,12 @@ export class VisitorService {
 
     if (result?.isBlocked) {
       throw new BadRequestException('You are blocked by the admin');
+    }
+
+    if (result?.isClear === false) {
+      throw new BadRequestException(
+        'Sorry you are not yet cleared by the admin',
+      );
     }
 
     return result;
@@ -174,7 +211,7 @@ export class VisitorService {
     });
 
     if (!lastVisit && modeOfUse === 'Check') {
-      throw new NotFoundException('No last visit found');
+      throw new NotFoundException('No last visit was found.');
     }
 
     return lastVisit;
@@ -200,15 +237,17 @@ export class VisitorService {
       modeOfUse: 'Check',
     });
 
-    if (lastVisit.isClear && lastVisit.clearedBy) {
+    const { id, isClear, clearedBy, status } = lastVisit;
+
+    if (isClear && clearedBy) {
       return lastVisit;
     }
 
-    return await this.prismaClientService.visitorStatus.update({
-      where: { id: lastVisit.id },
+    const clearedVisitor = await this.prismaClientService.visitorStatus.update({
+      where: { id },
       data: {
         isClear: true,
-        status: lastVisit.status === 'Denied' ? lastVisit.status : 'Approved',
+        status: status === 'Denied' ? status : 'Approved',
         clearedBy: { connect: { id: userId } },
         dateCleared: new Date(Date.now()),
         timeCleared: new Date(Date.now()),
@@ -219,6 +258,7 @@ export class VisitorService {
         isClear: true,
         visitor: {
           select: {
+            id: true,
             firstName: true,
             lastName: true,
             email: true,
@@ -245,5 +285,23 @@ export class VisitorService {
         timeCreated: true,
       },
     });
+
+    await this.prismaClientService.visitor.update({
+      where: { id: clearedVisitor.visitor.id },
+      data: { isClear: true },
+    });
+
+    await this.mailService.sendEmailWithTemplate({
+      to: clearedVisitor.visitor.email,
+      from: 'no-reply@kmc.solutions',
+      templateId: this.dhClearanceStatus,
+      dynamicTemplateData: {
+        firstName: clearedVisitor.visitor.firstName,
+      },
+      groupId: 15220,
+      groupsToDisplay: [15220],
+    });
+
+    return clearedVisitor;
   }
 }

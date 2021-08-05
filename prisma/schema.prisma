@@ -82,6 +82,7 @@ model Visitor {
   visitorStatusList VisitorStatus[]
   visitorNotes      VisitorNote[]
   visits            Visit[]
+  isClear           Boolean           @default(true)
   dateCreated       DateTime          @default(now()) @db.Date
   timeCreated       DateTime          @default(now()) @db.Timestamptz
 
@@ -276,11 +277,12 @@ model Event {
 }
 
 model Site {
-  siteId   Int     @id
-  siteName String  @unique @db.VarChar(100)
-  floors   Floor[]
-  Visits   Visit[]
-  events   Event[]
+  siteId    Int     @id
+  siteName  String  @unique @db.VarChar(100)
+  siteEmail String  @default("pica@kmc.solutions") @db.VarChar(100)
+  floors    Floor[]
+  Visits    Visit[]
+  events    Event[]
 
   @@map("sites")
 }
