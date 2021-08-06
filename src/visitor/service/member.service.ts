@@ -1,15 +1,52 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
-import { Visit } from '@prisma/client';
+import { ConfigService } from '@nestjs/config';
+import { LeaveType, Visit } from '@prisma/client';
+import { format } from 'date-fns';
+import { MailService } from 'src/mail/mail.service';
 import { PrismaClientService } from 'src/prisma-client/prisma-client.service';
 import { CreateMemberVisitorDTO } from 'src/visitor/dto/visitor/member/create-member-visit.dto';
 import { VisitorService } from './visitor.service';
 
 @Injectable()
 export class MemberService {
+  private mode: string;
+  private hdConfirmationMemberOnSite: string;
+  private hdConfirmationMemberWorkingFromHome: string;
+  private hdConfirmationMemberOnLeave: string;
+
   constructor(
     private prismaClientService: PrismaClientService,
     private visitorService: VisitorService,
-  ) {}
+    private config: ConfigService<{
+      sendGrid: {
+        hdConfirmationMemberOnSite: string;
+        hdConfirmationMemberWorkingFromHome: string;
+        hdConfirmationMemberOnLeave: string;
+      };
+      env: { mode: string };
+    }>,
+    private mailService: MailService,
+  ) {
+    this.mode = this.config.get<string>('env.mode', { infer: true });
+    this.hdConfirmationMemberOnSite = this.config.get<string>(
+      'sendGrid.hdConfirmationMemberOnSite',
+      {
+        infer: true,
+      },
+    );
+    this.hdConfirmationMemberWorkingFromHome = this.config.get<string>(
+      'sendGrid.hdConfirmationMemberWorkingFromHome',
+      {
+        infer: true,
+      },
+    );
+    this.hdConfirmationMemberOnLeave = this.config.get<string>(
+      'sendGrid.hdConfirmationMemberOnLeave',
+      {
+        infer: true,
+      },
+    );
+  }
 
   async createMemberVisitor(data: CreateMemberVisitorDTO) {
     const {
@@ -65,16 +102,12 @@ export class MemberService {
       return duplicateVisit;
     }
 
-    const memberIsClearOfAnySymptoms = questions
-      .map(
-        (question) =>
-          question.answers.includes('None of the above') ||
-          question.answers.includes('No'),
-      )
+    const guestNeedsAttention = this.visitorService
+      .isClearOfAnySymptoms(questions)
       .filter((answer) => answer === false).length;
 
     const healthTag = await this.prismaClientService.healthTag.findUnique({
-      where: { id: memberIsClearOfAnySymptoms ? 2 : 1 },
+      where: { id: guestNeedsAttention ? 2 : 1 },
     });
 
     let visit: Visit;
@@ -134,12 +167,12 @@ export class MemberService {
       data: {
         visitor: { connect: { id: member.id } },
         visit: { connect: { id: visit.id } },
-        status: memberIsClearOfAnySymptoms ? 'Denied' : 'Approved',
-        isClear: memberIsClearOfAnySymptoms ? false : true,
+        status: guestNeedsAttention ? 'Denied' : 'Approved',
+        isClear: guestNeedsAttention ? false : true,
       },
     });
 
-    return await this.prismaClientService.visit.findUnique({
+    const createdVisit = await this.prismaClientService.visit.findUnique({
       where: { id: visit.id },
       select: {
         id: true,
@@ -188,5 +221,98 @@ export class MemberService {
         timeCreated: true,
       },
     });
+
+    let leaveType: LeaveType;
+
+    const { type } = await this.prismaClientService.workType.findUnique({
+      where: { id: workTypeId },
+    });
+
+    if (leaveTypeId) {
+      leaveType = await this.prismaClientService.leaveType.findUnique({
+        where: { id: leaveTypeId },
+      });
+    }
+
+    const { siteName } = await this.prismaClientService.site.findUnique({
+      where: { siteId },
+    });
+
+    const { floor } = await this.prismaClientService.floor.findUnique({
+      where: { floorId },
+    });
+
+    if (workTypeId === 1) {
+      await this.mailService.sendEmailWithTemplate({
+        to: this.mode === 'development' ? email : 'health@kmc.solutions',
+        from: 'no-reply@kmc.solutions',
+        templateId: this.hdConfirmationMemberOnSite,
+        dynamicTemplateData: {
+          dateOfVisit: format(new Date(), 'MMMM dd, yyyy hh:mm a'),
+          firstName,
+          lastName,
+          email,
+          workType: type,
+          company,
+          site: siteName,
+          floor,
+          status: guestNeedsAttention ? 'Needs attention' : 'Clear',
+        },
+        groupId: 15220,
+        groupsToDisplay: [15220],
+      });
+    }
+
+    // Need to add some details
+    if (workTypeId === 2) {
+      await this.mailService.sendEmailWithTemplate({
+        to: this.mode === 'development' ? email : 'health@kmc.solutions',
+        from: 'no-reply@kmc.solutions',
+        templateId: this.hdConfirmationMemberWorkingFromHome,
+        dynamicTemplateData: {
+          dateOfVisit: format(new Date(), 'MMMM dd, yyyy hh:mm a'),
+          firstName,
+          lastName,
+          email,
+          workType: type,
+          company,
+          status: guestNeedsAttention ? 'Needs attention' : 'Clear',
+        },
+        groupId: 15220,
+        groupsToDisplay: [15220],
+      });
+    }
+
+    // Need to add some details
+    if (workTypeId === 3) {
+      await this.mailService.sendEmailWithTemplate({
+        to:
+          leaveType.type !== 'Sick leave' && //  Manual
+          leaveType.type !== 'Quarantine leave'
+            ? email
+            : 'health@kmc.solutions',
+        from: 'no-reply@kmc.solutions',
+        templateId: this.hdConfirmationMemberOnLeave,
+        dynamicTemplateData: {
+          dateOfVisit: format(new Date(), 'MMMM dd, yyyy hh:mm a'),
+          firstName,
+          lastName,
+          email,
+          workType: type,
+          leaveType: leaveType.type,
+          company,
+          status:
+            guestNeedsAttention ||
+            leaveType.type === 'Sick leave' ||
+            leaveType.type === 'Quarantine leave'
+              ? 'Needs attention'
+              : 'Clear',
+        },
+        groupId: 15220,
+        groupsToDisplay: [15220],
+      });
+    }
+
+    return createdVisit;
   }
 }
