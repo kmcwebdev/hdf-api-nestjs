@@ -9,7 +9,6 @@ import { VisitorService } from './visitor.service';
 
 @Injectable()
 export class MemberService {
-  private mode: string;
   private hdConfirmationMemberOnSite: string;
   private hdConfirmationMemberWorkingFromHome: string;
   private hdConfirmationMemberOnLeave: string;
@@ -23,11 +22,9 @@ export class MemberService {
         hdConfirmationMemberWorkingFromHome: string;
         hdConfirmationMemberOnLeave: string;
       };
-      env: { mode: string };
     }>,
     private mailService: MailService,
   ) {
-    this.mode = this.config.get<string>('env.mode', { infer: true });
     this.hdConfirmationMemberOnSite = this.config.get<string>(
       'sendGrid.hdConfirmationMemberOnSite',
       {
@@ -223,6 +220,8 @@ export class MemberService {
     });
 
     let leaveType: LeaveType;
+    let siteName: string;
+    let siteFloor: string;
 
     const { type } = await this.prismaClientService.workType.findUnique({
       where: { id: workTypeId },
@@ -234,17 +233,25 @@ export class MemberService {
       });
     }
 
-    const { siteName } = await this.prismaClientService.site.findUnique({
-      where: { siteId },
-    });
+    if (siteId) {
+      const site = await this.prismaClientService.site.findUnique({
+        where: { siteId },
+      });
 
-    const { floor } = await this.prismaClientService.floor.findUnique({
-      where: { floorId },
-    });
+      siteName = site.siteName;
+    }
+
+    if (floorId) {
+      const { floor } = await this.prismaClientService.floor.findUnique({
+        where: { floorId },
+      });
+
+      siteFloor = floor;
+    }
 
     if (workTypeId === 1) {
       await this.mailService.sendEmailWithTemplate({
-        to: this.mode === 'development' ? email : 'health@kmc.solutions',
+        to: !guestNeedsAttention ? email : 'health@kmc.solutions',
         from: 'no-reply@kmc.solutions',
         templateId: this.hdConfirmationMemberOnSite,
         dynamicTemplateData: {
@@ -255,7 +262,7 @@ export class MemberService {
           workType: type,
           company,
           site: siteName,
-          floor,
+          floor: siteFloor,
           status: guestNeedsAttention ? 'Needs attention' : 'Clear',
         },
         groupId: 15220,
@@ -266,7 +273,7 @@ export class MemberService {
     // Need to add some details
     if (workTypeId === 2) {
       await this.mailService.sendEmailWithTemplate({
-        to: this.mode === 'development' ? email : 'health@kmc.solutions',
+        to: !guestNeedsAttention ? email : 'health@kmc.solutions',
         from: 'no-reply@kmc.solutions',
         templateId: this.hdConfirmationMemberWorkingFromHome,
         dynamicTemplateData: {
@@ -283,14 +290,15 @@ export class MemberService {
       });
     }
 
+    const ON_LEAVE_MEMBER_NEEDS_ATTENTION =
+      guestNeedsAttention ||
+      leaveType.type === 'Sick leave' ||
+      leaveType.type === 'Quarantine leave';
+
     // Need to add some details
     if (workTypeId === 3) {
       await this.mailService.sendEmailWithTemplate({
-        to:
-          leaveType.type !== 'Sick leave' && //  Manual
-          leaveType.type !== 'Quarantine leave'
-            ? email
-            : 'health@kmc.solutions',
+        to: ON_LEAVE_MEMBER_NEEDS_ATTENTION ? 'health@kmc.solutions' : email,
         from: 'no-reply@kmc.solutions',
         templateId: this.hdConfirmationMemberOnLeave,
         dynamicTemplateData: {
@@ -301,12 +309,7 @@ export class MemberService {
           workType: type,
           leaveType: leaveType.type,
           company,
-          status:
-            guestNeedsAttention ||
-            leaveType.type === 'Sick leave' ||
-            leaveType.type === 'Quarantine leave'
-              ? 'Needs attention'
-              : 'Clear',
+          status: ON_LEAVE_MEMBER_NEEDS_ATTENTION ? 'Needs attention' : 'Clear',
         },
         groupId: 15220,
         groupsToDisplay: [15220],

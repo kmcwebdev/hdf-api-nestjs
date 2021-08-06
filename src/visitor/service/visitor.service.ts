@@ -5,8 +5,10 @@ import {
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { Visitor } from '@prisma/client';
+import { paginate } from 'src/common/utils/paginate.util';
 import { MailService } from 'src/mail/mail.service';
 import { PrismaClientService } from 'src/prisma-client/prisma-client.service';
+import { PTUserQuery } from 'src/user/query/user.query';
 import { CreateSubEmailsDTO } from 'src/visitor/dto/visitor/create-sub-emails.dto';
 import { CreateVisitorDTO } from 'src/visitor/dto/visitor/create-visitor.dto';
 import { QuestionDTO } from '../dto/visitor/question.dto';
@@ -29,6 +31,24 @@ export class VisitorService {
         infer: true,
       },
     );
+  }
+
+  async getVisits(query: PTUserQuery) {
+    const { page, limit, skip } = paginate(query.page, query.limit);
+
+    const result = await this.prismaClientService.$transaction([
+      this.prismaClientService.visit.findMany(),
+      this.prismaClientService.visit.count(),
+    ]);
+
+    return {
+      data: result[0],
+      pagination: {
+        page,
+        limit,
+        count: result[1],
+      },
+    };
   }
 
   async getOrCreateVisitor(data: CreateVisitorDTO) {

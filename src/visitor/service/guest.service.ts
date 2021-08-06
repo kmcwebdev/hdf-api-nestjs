@@ -9,7 +9,6 @@ import { VisitorService } from './visitor.service';
 
 @Injectable()
 export class GuestService {
-  private mode: string;
   private hdGuestApproval: string;
   private hdNeedsAttention: string;
 
@@ -18,11 +17,9 @@ export class GuestService {
     private visitorService: VisitorService,
     private config: ConfigService<{
       sendGrid: { hdGuestApproval: string; hdNeedsAttention: string };
-      env: { mode: string };
     }>,
     private mailService: MailService,
   ) {
-    this.mode = this.config.get<string>('env.mode', { infer: true });
     this.hdGuestApproval = this.config.get<string>('sendGrid.hdGuestApproval', {
       infer: true,
     });
@@ -216,10 +213,7 @@ export class GuestService {
       });
 
       await this.mailService.sendEmailWithTemplate({
-        to:
-          this.mode === 'development'
-            ? 'christian.sulit@kmc.solutions'
-            : 'health@kmc.solutions',
+        to: 'health@kmc.solutions',
         from: 'no-reply@kmc.solutions',
         templateId: this.hdNeedsAttention,
         dynamicTemplateData: {
