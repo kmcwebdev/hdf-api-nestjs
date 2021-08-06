@@ -79,13 +79,12 @@ export class MemberService {
 
     let visit: Visit;
 
-    if (leaveTypeId) {
+    if (workTypeId === 1) {
       visit = await this.prismaClientService.visit.create({
         data: {
           guest: false,
           visitor: { connect: { id: member.id } },
           workType: { connect: { id: workTypeId } },
-          leaveType: { connect: { id: leaveTypeId } },
           travelLocations: [travelLocations],
           site: { connect: { siteId } },
           floor: { connect: { floorId } },
@@ -94,12 +93,25 @@ export class MemberService {
       });
     }
 
-    if (!leaveTypeId) {
+    if (workTypeId === 2) {
       visit = await this.prismaClientService.visit.create({
         data: {
           guest: false,
           visitor: { connect: { id: member.id } },
           workType: { connect: { id: workTypeId } },
+          travelLocations: [travelLocations],
+          healthTag: { connect: { id: healthTag.id } },
+        },
+      });
+    }
+
+    if (workTypeId === 3) {
+      visit = await this.prismaClientService.visit.create({
+        data: {
+          guest: false,
+          visitor: { connect: { id: member.id } },
+          workType: { connect: { id: workTypeId } },
+          leaveType: { connect: { id: leaveTypeId } },
           travelLocations: [travelLocations],
           site: { connect: { siteId } },
           floor: { connect: { floorId } },
