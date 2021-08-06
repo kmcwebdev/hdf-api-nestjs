@@ -33,6 +33,7 @@ async function bootstrap() {
   app.enableCors({
     origin: [
       'http://localhost:3000',
+      'http://localhost:3001',
       'https://hdf.kmc.solutions',
       'https://health-declaration.kmc.solutions',
     ],

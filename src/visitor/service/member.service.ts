@@ -290,13 +290,13 @@ export class MemberService {
       });
     }
 
-    const ON_LEAVE_MEMBER_NEEDS_ATTENTION =
-      guestNeedsAttention ||
-      leaveType.type === 'Sick leave' ||
-      leaveType.type === 'Quarantine leave';
-
     // Need to add some details
     if (workTypeId === 3) {
+      const ON_LEAVE_MEMBER_NEEDS_ATTENTION =
+        guestNeedsAttention ||
+        leaveType.type === 'Sick leave' ||
+        leaveType.type === 'Quarantine leave';
+
       await this.mailService.sendEmailWithTemplate({
         to: ON_LEAVE_MEMBER_NEEDS_ATTENTION ? 'health@kmc.solutions' : email,
         from: 'no-reply@kmc.solutions',

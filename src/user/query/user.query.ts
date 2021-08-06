@@ -15,53 +15,53 @@ import { UserType } from 'src/user/enum/user-type.enum';
 import { PaginationQuery } from '../../common/query/pagination.query';
 
 export class PTUserQuery extends PartialType(PaginationQuery) {
-  @ApiProperty()
+  @ApiProperty({ required: false })
   @IsOptional()
   @IsEmail()
   readonly email: string;
 
-  @ApiProperty()
+  @ApiProperty({ required: false })
   @IsOptional()
   @IsEnum(UserType)
   readonly userType: UserType;
 
-  @ApiProperty()
+  @ApiProperty({ required: false })
   @IsOptional()
   @IsBoolean()
   readonly isLocked: boolean;
 
-  @ApiProperty()
+  @ApiProperty({ required: false })
   @IsOptional()
   @IsNotEmpty()
   @IsString()
   readonly firstName: string;
 
-  @ApiProperty()
+  @ApiProperty({ required: false })
   @IsOptional()
   @IsNotEmpty()
   @IsString()
   readonly lastName: string;
 
-  @ApiProperty()
+  @ApiProperty({ required: false })
   @IsOptional()
   @IsNotEmpty()
   @IsString()
   readonly phoneNumber: string;
 
-  @ApiProperty()
+  @ApiProperty({ required: false })
   @IsOptional()
   @IsNotEmpty()
   @IsString()
   readonly organization: string;
 
-  @ApiProperty()
+  @ApiProperty({ required: false })
   @IsOptional()
   @IsDateString()
   @Validate(IsBeforeConstraint, ['createdTo'])
-  createdFrom: Date;
+  readonly createdFrom: Date;
 
-  @ApiProperty()
+  @ApiProperty({ required: false })
   @IsOptional()
   @IsDateString()
-  createdTo: Date;
+  readonly createdTo: Date;
 }

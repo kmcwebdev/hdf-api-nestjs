@@ -36,9 +36,10 @@ model User {
 }
 
 model UserSiteFilter {
-  id   Int    @id @default(autoincrement())
-  user User[]
-  site Site[]
+  id     Int    @id @default(autoincrement())
+  userId Int?
+  user   User?  @relation(fields: [userId], references: [id])
+  site   Site[]
 }
 
 model RefreshToken {
