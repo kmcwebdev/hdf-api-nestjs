@@ -20,12 +20,21 @@ import { Request } from 'express';
 import { JwtAuthGuard } from 'src/auth/guard/jwt.guard';
 import { EmailQuery } from 'src/user/query/email.query';
 import { CreateSubEmailsDTO } from 'src/visitor/dto/visitor/create-sub-emails.dto';
+import { PTVisitQuery } from '../query/visit.query';
 import { VisitorService } from '../service/visitor.service';
 
 @ApiTags('Visitor')
 @Controller('visitors')
 export class VisitorController {
   constructor(private visitorService: VisitorService) {}
+
+  @Get('visits')
+  @UseGuards(JwtAuthGuard)
+  @ApiQuery({ type: PTVisitQuery, required: false })
+  @ApiOkResponse({ description: 'Success' })
+  getUsers(@Query() query: PTVisitQuery) {
+    return this.visitorService.getVisits(query);
+  }
 
   @Post('check-email')
   @HttpCode(200)

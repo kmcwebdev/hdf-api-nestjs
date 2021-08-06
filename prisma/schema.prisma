@@ -9,29 +9,36 @@ generator client {
 }
 
 model User {
-  id                       Int             @id @default(autoincrement())
-  profileId                Int?            @unique
-  profile                  UserProfile?    @relation(fields: [profileId], references: [id])
-  email                    String          @unique @db.VarChar(100)
+  id                       Int              @id @default(autoincrement())
+  profileId                Int?             @unique
+  profile                  UserProfile?     @relation(fields: [profileId], references: [id])
+  email                    String           @unique @db.VarChar(100)
   password                 String
-  userType                 String          @db.VarChar(50)
-  isLocked                 Boolean         @default(true)
+  userType                 String           @db.VarChar(50)
+  isLocked                 Boolean          @default(true)
   registeredById           Int?
-  registeredBy             User?           @relation("EncoderToUser", fields: [registeredById], references: [id])
-  listOfEncodedAccounts    User[]          @relation("EncoderToUser")
-  passwordResetToken       String?         @unique @db.VarChar(255)
+  registeredBy             User?            @relation("EncoderToUser", fields: [registeredById], references: [id])
+  listOfEncodedAccounts    User[]           @relation("EncoderToUser")
+  passwordResetToken       String?          @unique @db.VarChar(255)
   passwordResetTokenExpire DateTime?
   passwordChangedAt        DateTime?
-  emailConfirm             Boolean         @default(false)
+  emailConfirm             Boolean          @default(false)
   permissions              Permission[]
   visitorNotes             VisitorNote[]
   clearedVisitors          VisitorStatus[]
   visitorClearance         Clearance[]
   refreshTokens            RefreshToken[]
-  dateCreated              DateTime        @default(now()) @db.Date
-  timeCreated              DateTime        @default(now()) @db.Time
+  userSiteFilters          UserSiteFilter[]
+  dateCreated              DateTime         @default(now()) @db.Date
+  timeCreated              DateTime         @default(now()) @db.Time
 
   @@map("users")
+}
+
+model UserSiteFilter {
+  id   Int    @id @default(autoincrement())
+  user User[]
+  site Site[]
 }
 
 model RefreshToken {
@@ -267,12 +274,13 @@ model Event {
 }
 
 model Site {
-  siteId    Int     @id
-  siteName  String  @unique @db.VarChar(100)
-  siteEmail String  @default("pica@kmc.solutions") @db.VarChar(100)
-  floors    Floor[]
-  Visits    Visit[]
-  events    Event[]
+  siteId          Int              @id
+  siteName        String           @unique @db.VarChar(100)
+  siteEmail       String           @default("pica@kmc.solutions") @db.VarChar(100)
+  floors          Floor[]
+  Visits          Visit[]
+  events          Event[]
+  userSiteFilters UserSiteFilter[]
 
   @@map("sites")
 }

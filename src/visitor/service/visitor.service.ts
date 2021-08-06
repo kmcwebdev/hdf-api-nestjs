@@ -8,10 +8,10 @@ import { Visitor } from '@prisma/client';
 import { paginate } from 'src/common/utils/paginate.util';
 import { MailService } from 'src/mail/mail.service';
 import { PrismaClientService } from 'src/prisma-client/prisma-client.service';
-import { PTUserQuery } from 'src/user/query/user.query';
 import { CreateSubEmailsDTO } from 'src/visitor/dto/visitor/create-sub-emails.dto';
 import { CreateVisitorDTO } from 'src/visitor/dto/visitor/create-visitor.dto';
 import { QuestionDTO } from '../dto/visitor/question.dto';
+import { PTVisitQuery } from '../query/visit.query';
 
 @Injectable()
 export class VisitorService {
@@ -33,11 +33,40 @@ export class VisitorService {
     );
   }
 
-  async getVisits(query: PTUserQuery) {
+  async getVisits(query: PTVisitQuery) {
     const { page, limit, skip } = paginate(query.page, query.limit);
 
     const result = await this.prismaClientService.$transaction([
-      this.prismaClientService.visit.findMany(),
+      this.prismaClientService.visit.findMany({
+        skip,
+        take: limit,
+        select: {
+          id: true,
+          guest: true,
+          visitor: {
+            select: {
+              id: true,
+              firstName: true,
+              lastName: true,
+              email: true,
+              phoneNumber: true,
+              company: true,
+            },
+          },
+          healthTag: {
+            select: {
+              tag: true,
+            },
+          },
+          visitorStatus: {
+            select: {
+              status: true,
+            },
+          },
+          dateCreated: true,
+          timeCreated: true,
+        },
+      }),
       this.prismaClientService.visit.count(),
     ]);
 
