@@ -37,7 +37,7 @@ model User {
 
 model UserSiteFilter {
   id     Int    @id @default(autoincrement())
-  userId Int?
+  userId Int?   @unique
   user   User?  @relation(fields: [userId], references: [id])
   site   Site[]
 }
