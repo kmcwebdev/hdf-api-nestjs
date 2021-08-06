@@ -8,6 +8,8 @@ import {
   IsNotEmpty,
   IsOptional,
   IsString,
+  Max,
+  Min,
   ValidateNested,
 } from 'class-validator';
 import { QuestionDTO } from '../question.dto';
@@ -51,12 +53,15 @@ export class CreateMemberVisitorDTO {
   @ApiProperty()
   @IsInt()
   @Type(() => Number)
+  @Min(1)
+  @Max(3)
   readonly workTypeId: number;
 
   @ApiProperty()
   @IsOptional()
   @IsInt()
   @Type(() => Number)
+  @Min(1)
   readonly leaveTypeId: number;
 
   @ApiProperty({ type: [QuestionDTO] })
@@ -70,11 +75,13 @@ export class CreateMemberVisitorDTO {
   @IsOptional()
   @IsInt()
   @Type(() => Number)
+  @Min(1)
   readonly siteId: number;
 
   @ApiProperty()
   @IsOptional()
   @IsInt()
   @Type(() => Number)
+  @Min(1)
   readonly floorId: number;
 }
