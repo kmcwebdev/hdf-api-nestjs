@@ -162,21 +162,15 @@ export class UserService {
     });
   }
 
-  async checkUserEmail(email: string) {
-    const userEmail = await this.prismaClientService.user.findUnique({
+  async checkUserByEmail(email: string) {
+    const user = await this.prismaClientService.user.findUnique({
       where: { email },
     });
 
-    return userEmail;
+    return user;
   }
 
-  async checkInternalUserDuplication(email: string) {
-    const checkDuplication = await this.checkUserEmail(email);
-
-    if (checkDuplication) {
-      throw new BadRequestException('User is already registered');
-    }
-
+  async checkInternalUserInAzureAd(email: string) {
     const internalUser = await firstValueFrom<GraphUser>(
       this.azureGraphService.getEmailDetails(email),
     );
@@ -193,17 +187,9 @@ export class UserService {
       throw new BadRequestException('This is an external user email');
     }
 
-    const checkDuplication = await this.checkUserEmail(email);
+    const user = await this.checkUserByEmail(email);
 
-    if (checkDuplication) {
-      return {
-        isAvailable: false,
-      };
-    }
-
-    return {
-      isAvailable: true,
-    };
+    return user;
   }
 
   async updateProfile(data: { id: number; payload: PTUpdateProfileDTO }) {
@@ -266,7 +252,13 @@ export class UserService {
     const { userId, payload } = data;
     const { email } = payload;
 
-    const internalUser = await this.checkInternalUserDuplication(email);
+    const internalUser = await this.checkInternalUserInAzureAd(email);
+
+    const checkDuplication = await this.checkUserByEmail(internalUser.mail);
+
+    if (checkDuplication) {
+      return checkDuplication;
+    }
 
     const hashedPassword = await hashPassword(internalUser.id);
 
@@ -299,6 +291,12 @@ export class UserService {
   }) {
     const { userId, payload } = data;
     const { email, firstName, lastName, organization, password } = payload;
+
+    const checkDuplication = await this.checkExternalUserDuplication(email);
+
+    if (Object.keys(checkDuplication).length) {
+      return checkDuplication;
+    }
 
     const hashedPassword = await hashPassword(password);
 

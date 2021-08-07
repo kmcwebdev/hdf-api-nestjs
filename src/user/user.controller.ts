@@ -13,7 +13,6 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import {
-  ApiBadRequestResponse,
   ApiBody,
   ApiCreatedResponse,
   ApiOkResponse,
@@ -24,7 +23,6 @@ import {
 import { Request } from 'express';
 import { JwtAuthGuard } from 'src/auth/guard/jwt.guard';
 import { ExternalRegisterDTO } from 'src/user/dto/external-register.dto';
-import { EmailQuery } from 'src/user/query/email.query';
 import { PTUserQuery } from 'src/user/query/user.query';
 import { InternalRegisterDTO } from './dto/internal-register.dto';
 import { PTUpdateProfileDTO, UpdateProfileDTO } from './dto/update-profile.dto';
@@ -112,28 +110,6 @@ export class UserController {
       userId: id,
       payload: data,
     });
-  }
-
-  @ApiTags('User')
-  @Get('internal-duplication')
-  @ApiQuery({ type: EmailQuery })
-  @ApiOkResponse({ description: 'Success' })
-  @ApiBadRequestResponse({
-    description: 'User is already registered or no user found',
-  })
-  checkInternalUserDuplication(@Query() { email }: EmailQuery) {
-    return this.userService.checkInternalUserDuplication(email);
-  }
-
-  @ApiTags('User')
-  @Get('external-duplication')
-  @ApiQuery({ type: EmailQuery })
-  @ApiOkResponse({ description: 'Success' })
-  @ApiBadRequestResponse({
-    description: 'User is already registered or user is an internal email',
-  })
-  checkExternalUserDuplication(@Query() { email }: EmailQuery) {
-    return this.userService.checkExternalUserDuplication(email);
   }
 
   @ApiTags('User')
