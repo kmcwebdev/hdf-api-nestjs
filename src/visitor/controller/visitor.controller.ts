@@ -3,6 +3,8 @@ import {
   Controller,
   Get,
   HttpCode,
+  Param,
+  ParseIntPipe,
   Patch,
   Post,
   Query,
@@ -13,6 +15,7 @@ import {
   ApiBody,
   ApiCreatedResponse,
   ApiOkResponse,
+  ApiParam,
   ApiQuery,
   ApiTags,
 } from '@nestjs/swagger';
@@ -32,8 +35,16 @@ export class VisitorController {
   @UseGuards(JwtAuthGuard)
   @ApiQuery({ type: PTVisitQuery, required: false })
   @ApiOkResponse({ description: 'Success' })
-  getUsers(@Query() query: PTVisitQuery) {
+  getVisits(@Query() query: PTVisitQuery) {
     return this.visitorService.getVisits(query);
+  }
+
+  @Get('visits/:visitId')
+  @UseGuards(JwtAuthGuard)
+  @ApiParam({ name: 'visitId', description: 'Visit id' })
+  @ApiOkResponse({ description: 'Success' })
+  getVisit(@Param('visitId', new ParseIntPipe()) visitId: number) {
+    return this.visitorService.getVisit(visitId);
   }
 
   @Post('check-email')

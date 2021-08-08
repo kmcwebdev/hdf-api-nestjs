@@ -111,6 +111,60 @@ export class VisitorService {
     };
   }
 
+  async getVisit(visitId: number) {
+    return await this.prismaClientService.visit.findUnique({
+      where: { id: visitId },
+      select: {
+        id: true,
+        guest: true,
+        workType: true,
+        leaveType: true,
+        visitor: {
+          select: {
+            id: true,
+            firstName: true,
+            lastName: true,
+            email: true,
+            phoneNumber: true,
+            company: true,
+            address: true,
+          },
+        },
+        site: {
+          select: {
+            siteName: true,
+          },
+        },
+        floor: {
+          select: {
+            floor: true,
+          },
+        },
+        healthTag: {
+          select: {
+            tag: true,
+          },
+        },
+        visitorStatus: {
+          select: {
+            status: true,
+          },
+        },
+        surveys: {
+          select: {
+            question: true,
+            answers: true,
+          },
+        },
+        poc: true,
+        pocEmail: true,
+        purposeOfVisit: true,
+        dateCreated: true,
+        timeCreated: true,
+      },
+    });
+  }
+
   async getOrCreateVisitor(data: CreateVisitorDTO) {
     const { email } = data;
 
