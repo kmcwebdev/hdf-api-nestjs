@@ -39,7 +39,7 @@ model UserSiteFilter {
   id     Int    @id @default(autoincrement())
   userId Int?   @unique
   user   User?  @relation(fields: [userId], references: [id])
-  site   Site[]
+  sites  Site[]
 }
 
 model RefreshToken {

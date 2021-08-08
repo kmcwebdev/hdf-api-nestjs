@@ -20,6 +20,7 @@ import { SiteModule } from './site/site.module';
 import { UserModule } from './user/user.module';
 import { VisitEventGatewayModule } from './visit-event-gateway/visit-event-gateway.module';
 import { VisitorModule } from './visitor/visitor.module';
+import { FilterConfigModule } from './filter-config/filter-config.module';
 
 @Module({
   imports: [
@@ -53,6 +54,7 @@ import { VisitorModule } from './visitor/visitor.module';
     MiscModule,
     MailModule,
     VisitEventGatewayModule,
+    FilterConfigModule,
   ],
 })
 export class AppModule {}
