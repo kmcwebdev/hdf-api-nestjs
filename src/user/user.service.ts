@@ -39,25 +39,27 @@ export class UserService {
 
     const { page, limit, skip } = paginate(query.page, query.limit);
 
+    const where = {
+      email: { contains: email, mode: 'insensitive' },
+      userType: { equals: userType },
+      isLocked: { equals: isLocked },
+      profile: {
+        firstName: { contains: firstName, mode: 'insensitive' },
+        lastName: { contains: lastName, mode: 'insensitive' },
+        phoneNumber: { contains: phoneNumber, mode: 'insensitive' },
+        organization: { contains: organization, mode: 'insensitive' },
+      },
+      dateCreated: {
+        gte: createdFrom ? new Date(createdFrom) : undefined,
+        lte: createdFrom ? new Date(createdTo) : undefined,
+      },
+    } as const;
+
     const result = await this.prismaClientService.$transaction([
       this.prismaClientService.user.findMany({
         skip,
         take: limit,
-        where: {
-          email: { contains: email, mode: 'insensitive' },
-          userType: { equals: userType },
-          isLocked: { equals: isLocked },
-          profile: {
-            firstName: { contains: firstName, mode: 'insensitive' },
-            lastName: { contains: lastName, mode: 'insensitive' },
-            phoneNumber: { contains: phoneNumber, mode: 'insensitive' },
-            organization: { contains: organization, mode: 'insensitive' },
-          },
-          dateCreated: {
-            gte: createdFrom ? new Date(createdFrom) : undefined,
-            lte: createdFrom ? new Date(createdTo) : undefined,
-          },
-        },
+        where,
         select: {
           id: true,
           email: true,
@@ -79,21 +81,7 @@ export class UserService {
         },
       }),
       this.prismaClientService.user.count({
-        where: {
-          email: { contains: email, mode: 'insensitive' },
-          userType: { equals: userType },
-          isLocked: { equals: isLocked },
-          profile: {
-            firstName: { contains: firstName, mode: 'insensitive' },
-            lastName: { contains: lastName, mode: 'insensitive' },
-            phoneNumber: { contains: phoneNumber, mode: 'insensitive' },
-            organization: { contains: organization, mode: 'insensitive' },
-          },
-          dateCreated: {
-            gte: createdFrom ? new Date(createdFrom) : undefined,
-            lte: createdTo ? new Date(createdTo) : undefined,
-          },
-        },
+        where,
       }),
     ]);
 

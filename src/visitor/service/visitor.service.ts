@@ -48,25 +48,27 @@ export class VisitorService {
 
     const { page, limit, skip } = paginate(query.page, query.limit);
 
+    const where = {
+      guest: { equals: guest },
+      visitor: {
+        firstName: { equals: firstName, mode: 'insensitive' },
+        lastName: { equals: lastName, mode: 'insensitive' },
+        email: { equals: email, mode: 'insensitive' },
+      },
+      siteId: { equals: siteId },
+      healthTag: { tag: { equals: tag } },
+      visitorStatus: { status: { equals: status } },
+      dateCreated: {
+        gte: dateFrom ? new Date(dateFrom) : undefined,
+        lte: dateTo ? new Date(dateTo) : undefined,
+      },
+    } as const;
+
     const result = await this.prismaClientService.$transaction([
       this.prismaClientService.visit.findMany({
         skip,
         take: limit,
-        where: {
-          guest: { equals: guest },
-          visitor: {
-            firstName: { equals: firstName, mode: 'insensitive' },
-            lastName: { equals: lastName, mode: 'insensitive' },
-            email: { equals: email, mode: 'insensitive' },
-          },
-          siteId: { equals: siteId },
-          healthTag: { tag: { equals: tag } },
-          visitorStatus: { status: { equals: status } },
-          dateCreated: {
-            gte: dateFrom ? new Date(dateFrom) : undefined,
-            lte: dateTo ? new Date(dateTo) : undefined,
-          },
-        },
+        where,
         select: {
           id: true,
           guest: true,
@@ -95,21 +97,7 @@ export class VisitorService {
         },
       }),
       this.prismaClientService.visit.count({
-        where: {
-          guest: { equals: guest },
-          visitor: {
-            firstName: { equals: firstName, mode: 'insensitive' },
-            lastName: { equals: lastName, mode: 'insensitive' },
-            email: { equals: email, mode: 'insensitive' },
-          },
-          siteId: { equals: siteId },
-          healthTag: { tag: { equals: tag } },
-          visitorStatus: { status: { equals: status } },
-          dateCreated: {
-            gte: dateFrom ? new Date(dateFrom) : undefined,
-            lte: dateTo ? new Date(dateTo) : undefined,
-          },
-        },
+        where,
       }),
     ]);
 
