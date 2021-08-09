@@ -142,6 +142,7 @@ export class MemberService {
           visitor: { connect: { id: member.id } },
           workType: { connect: { id: workTypeId } },
           leaveType: { connect: { id: leaveTypeId } },
+          // Manual?
           travelLocations: [travelLocations],
           site: { connect: { siteId } },
           floor: { connect: { floorId } },

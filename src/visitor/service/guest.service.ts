@@ -95,6 +95,7 @@ export class GuestService {
       data: {
         guest: true,
         visitor: { connect: { id: guest.id } },
+        // Manual?
         travelLocations: [travelLocations],
         site: { connect: { siteId } },
         floor: { connect: { floorId } },
