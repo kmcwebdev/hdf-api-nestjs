@@ -363,8 +363,8 @@ export class VisitorService {
     });
   }
 
-  async clearVisitor(data: { userId: number; email: string }) {
-    const { userId, email } = data;
+  async clearVisitor(data: { userId: number; email: string; note: string }) {
+    const { userId, email, note } = data;
 
     const lastVisit = await this.checkLastVisitorVisitStatus({
       email,
@@ -423,6 +423,14 @@ export class VisitorService {
     await this.prismaClientService.visitor.update({
       where: { id: clearedVisitor.visitor.id },
       data: { isClear: true },
+    });
+
+    await this.prismaClientService.visitorNote.create({
+      data: {
+        note,
+        authorId: userId,
+        visitorId: clearedVisitor.visitor.id,
+      },
     });
 
     await this.mailService.sendEmailWithTemplate({

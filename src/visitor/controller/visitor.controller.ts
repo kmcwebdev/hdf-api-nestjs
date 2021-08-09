@@ -21,6 +21,7 @@ import {
 } from '@nestjs/swagger';
 import { Request } from 'express';
 import { JwtAuthGuard } from 'src/auth/guard/jwt.guard';
+import { CreateVisitorNoteDTO } from 'src/user/dto/create-visitor-note.dto';
 import { EmailQuery } from 'src/user/query/email.query';
 import { CreateSubEmailsDTO } from 'src/visitor/dto/visitor/create-sub-emails.dto';
 import { PTVisitQuery } from '../query/visit.query';
@@ -76,7 +77,15 @@ export class VisitorController {
   @UseGuards(JwtAuthGuard)
   @ApiQuery({ type: EmailQuery })
   @ApiOkResponse({ description: 'Success' })
-  clearVisitor(@Req() req: Request, @Query() { email }: EmailQuery) {
-    return this.visitorService.clearVisitor({ userId: req.user.id, email });
+  clearVisitor(
+    @Req() req: Request,
+    @Query() { email }: EmailQuery,
+    @Body() { note }: CreateVisitorNoteDTO,
+  ) {
+    return this.visitorService.clearVisitor({
+      userId: req.user.id,
+      email,
+      note,
+    });
   }
 }
