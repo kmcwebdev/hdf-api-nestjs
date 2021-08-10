@@ -99,12 +99,12 @@ export class MemberService {
       return duplicateVisit;
     }
 
-    const guestNeedsAttention = this.visitorService
+    const memberNeedsAttention = this.visitorService
       .isClearOfAnySymptoms(questions)
       .filter((answer) => answer === false).length;
 
     const healthTag = await this.prismaClientService.healthTag.findUnique({
-      where: { id: guestNeedsAttention ? 2 : 1 },
+      where: { id: memberNeedsAttention ? 2 : 1 },
     });
 
     let visit: Visit;
@@ -165,10 +165,17 @@ export class MemberService {
       data: {
         visitor: { connect: { id: member.id } },
         visit: { connect: { id: visit.id } },
-        status: guestNeedsAttention ? 'Denied' : 'Approved',
-        isClear: guestNeedsAttention ? false : true,
+        status: memberNeedsAttention ? 'Denied' : 'Approved',
+        isClear: memberNeedsAttention ? false : true,
       },
     });
+
+    if (memberNeedsAttention) {
+      await this.prismaClientService.visitor.update({
+        where: { id: member.id },
+        data: { isBlocked: true },
+      });
+    }
 
     const createdVisit = await this.prismaClientService.visit.findUnique({
       where: { id: visit.id },
@@ -252,7 +259,7 @@ export class MemberService {
 
     if (workTypeId === 1) {
       await this.mailService.sendEmailWithTemplate({
-        to: !guestNeedsAttention ? email : 'health@kmc.solutions',
+        to: !memberNeedsAttention ? email : 'health@kmc.solutions',
         from: 'no-reply@kmc.solutions',
         templateId: this.hdConfirmationMemberOnSite,
         dynamicTemplateData: {
@@ -264,7 +271,7 @@ export class MemberService {
           company,
           site: siteName,
           floor: siteFloor,
-          status: guestNeedsAttention ? 'Needs attention' : 'Clear',
+          status: memberNeedsAttention ? 'Needs attention' : 'Clear',
         },
         groupId: 15220,
         groupsToDisplay: [15220],
@@ -274,7 +281,7 @@ export class MemberService {
     // Need to add some details
     if (workTypeId === 2) {
       await this.mailService.sendEmailWithTemplate({
-        to: !guestNeedsAttention ? email : 'health@kmc.solutions',
+        to: !memberNeedsAttention ? email : 'health@kmc.solutions',
         from: 'no-reply@kmc.solutions',
         templateId: this.hdConfirmationMemberWorkingFromHome,
         dynamicTemplateData: {
@@ -284,7 +291,7 @@ export class MemberService {
           email,
           workType: type,
           company,
-          status: guestNeedsAttention ? 'Needs attention' : 'Clear',
+          status: memberNeedsAttention ? 'Needs attention' : 'Clear',
         },
         groupId: 15220,
         groupsToDisplay: [15220],
@@ -294,7 +301,7 @@ export class MemberService {
     // Need to add some details
     if (workTypeId === 3) {
       const ON_LEAVE_MEMBER_NEEDS_ATTENTION =
-        guestNeedsAttention ||
+        memberNeedsAttention ||
         leaveType.type === 'Sick leave' ||
         leaveType.type === 'Quarantine leave';
 

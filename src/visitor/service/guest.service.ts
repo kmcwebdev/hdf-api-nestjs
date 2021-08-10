@@ -125,6 +125,13 @@ export class GuestService {
       },
     });
 
+    if (guestNeedsAttention) {
+      await this.prismaClientService.visitor.update({
+        where: { id: guest.id },
+        data: { isBlocked: true },
+      });
+    }
+
     const guestVisit = await this.prismaClientService.visit.findUnique({
       where: { id: visit.id },
       select: {
