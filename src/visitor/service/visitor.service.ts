@@ -520,7 +520,7 @@ export class VisitorService {
 
     await this.prismaClientService.visitor.update({
       where: { id: clearedVisitor.visitor.id },
-      data: { isClear: true },
+      data: { isBlocked: false, isClear: true },
     });
 
     await this.prismaClientService.visitorNote.create({
