@@ -11,6 +11,7 @@ import { PrismaClientService } from 'src/prisma-client/prisma-client.service';
 import { CreateSubEmailsDTO } from 'src/visitor/dto/visitor/create-sub-emails.dto';
 import { CreateVisitorDTO } from 'src/visitor/dto/visitor/create-visitor.dto';
 import { QuestionDTO } from '../dto/visitor/question.dto';
+import { PTVisitHistoryQuery } from '../query/visit-history.query';
 import { PTVisitQuery } from '../query/visit.query';
 
 @Injectable()
@@ -51,8 +52,8 @@ export class VisitorService {
     const where = {
       guest: { equals: guest },
       visitor: {
-        firstName: { equals: firstName, mode: 'insensitive' },
-        lastName: { equals: lastName, mode: 'insensitive' },
+        firstName: { contains: firstName, mode: 'insensitive' },
+        lastName: { contains: lastName, mode: 'insensitive' },
         email: { equals: email, mode: 'insensitive' },
       },
       siteId: { equals: siteId },
@@ -94,6 +95,9 @@ export class VisitorService {
           },
           dateCreated: true,
           timeCreated: true,
+        },
+        orderBy: {
+          id: 'desc',
         },
       }),
       this.prismaClientService.visit.count({
@@ -163,6 +167,80 @@ export class VisitorService {
         timeCreated: true,
       },
     });
+  }
+
+  async getVisitHistories(query: PTVisitHistoryQuery) {
+    const { visitorId } = query;
+
+    const { siteId, dateFrom, dateTo, timeFrom, timeTo } = query;
+
+    const { page, limit, skip } = paginate(query.page, query.limit);
+
+    const where = {
+      visitorId: {
+        equals: visitorId,
+      },
+      siteId: {
+        equals: siteId,
+      },
+      OR: [
+        {
+          workType: {
+            type: {
+              equals: 'On site',
+            },
+          },
+        },
+        {
+          workTypeId: null,
+        },
+      ],
+      dateCreated: {
+        gte: dateFrom ? new Date(dateFrom) : undefined,
+        lte: dateTo ? new Date(dateTo) : undefined,
+      },
+      timeCreated: {
+        gte: timeFrom ? new Date(timeFrom) : undefined,
+        lte: timeTo ? new Date(timeTo) : undefined,
+      },
+    };
+
+    const result = await this.prismaClientService.$transaction([
+      this.prismaClientService.visit.findMany({
+        skip,
+        take: limit,
+        where,
+        select: {
+          site: {
+            select: {
+              siteName: true,
+            },
+          },
+          floor: {
+            select: {
+              floor: true,
+            },
+          },
+          dateCreated: true,
+          timeCreated: true,
+        },
+        orderBy: {
+          id: 'desc',
+        },
+      }),
+      this.prismaClientService.visit.count({
+        where,
+      }),
+    ]);
+
+    return {
+      data: result[0],
+      pagination: {
+        page,
+        limit,
+        count: result[1],
+      },
+    };
   }
 
   async getOrCreateVisitor(data: CreateVisitorDTO) {

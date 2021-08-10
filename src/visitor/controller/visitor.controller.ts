@@ -24,6 +24,7 @@ import { JwtAuthGuard } from 'src/auth/guard/jwt.guard';
 import { CreateVisitorNoteDTO } from 'src/user/dto/create-visitor-note.dto';
 import { EmailQuery } from 'src/user/query/email.query';
 import { CreateSubEmailsDTO } from 'src/visitor/dto/visitor/create-sub-emails.dto';
+import { PTVisitHistoryQuery } from '../query/visit-history.query';
 import { PTVisitQuery } from '../query/visit.query';
 import { VisitorService } from '../service/visitor.service';
 
@@ -38,6 +39,14 @@ export class VisitorController {
   @ApiOkResponse({ description: 'Success' })
   getVisits(@Query() query: PTVisitQuery) {
     return this.visitorService.getVisits(query);
+  }
+
+  @Get('visits/histories')
+  @UseGuards(JwtAuthGuard)
+  @ApiQuery({ type: PTVisitHistoryQuery, required: false })
+  @ApiOkResponse({ description: 'Success' })
+  getVisitHistories(@Query() query: PTVisitHistoryQuery) {
+    return this.visitorService.getVisitHistories(query);
   }
 
   @Get('visits/:visitId')
