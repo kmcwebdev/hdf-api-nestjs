@@ -73,6 +73,22 @@ export class VisitorController {
     return this.visitorService.createVisitorSubEmails(data);
   }
 
+  @Post('notes')
+  @UseGuards(JwtAuthGuard)
+  @ApiQuery({ name: 'userId', description: 'User id' })
+  @ApiCreatedResponse({ description: 'Created' })
+  createVisitorNote(
+    @Req() req: Request,
+    @Query('userId', new ParseIntPipe()) userId: number,
+    @Body() { note }: CreateVisitorNoteDTO,
+  ) {
+    return this.visitorService.createVisitorNote({
+      userId,
+      authorId: req.user.id,
+      note,
+    });
+  }
+
   @Patch('clear')
   @UseGuards(JwtAuthGuard)
   @ApiQuery({ type: EmailQuery })

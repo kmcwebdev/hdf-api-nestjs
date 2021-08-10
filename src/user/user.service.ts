@@ -153,6 +153,11 @@ export class UserService {
   async checkUserByEmail(email: string) {
     const user = await this.prismaClientService.user.findUnique({
       where: { email },
+      select: {
+        id: true,
+        email: true,
+        userType: true,
+      },
     });
 
     return user;

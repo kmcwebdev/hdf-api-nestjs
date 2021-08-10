@@ -363,6 +363,26 @@ export class VisitorService {
     });
   }
 
+  async createVisitorNote(data: {
+    userId: number;
+    authorId: number;
+    note: string;
+  }) {
+    const { userId, authorId, note } = data;
+
+    return await this.prismaClientService.visitorNote.create({
+      data: {
+        note,
+        authorId,
+        visitorId: userId,
+      },
+      select: {
+        id: true,
+        note: true,
+      },
+    });
+  }
+
   async clearVisitor(data: { userId: number; email: string; note: string }) {
     const { userId, email, note } = data;
 
@@ -371,10 +391,10 @@ export class VisitorService {
       modeOfUse: 'Check',
     });
 
-    const { id, isClear, clearedBy, status } = lastVisit;
+    const { id, isClear, status } = lastVisit;
 
-    if (isClear && clearedBy) {
-      return lastVisit;
+    if (isClear) {
+      throw new BadRequestException('Visitor health status is clear');
     }
 
     const clearedVisitor = await this.prismaClientService.visitorStatus.update({
