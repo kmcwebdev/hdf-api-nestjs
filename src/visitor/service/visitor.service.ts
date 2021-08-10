@@ -132,6 +132,8 @@ export class VisitorService {
             phoneNumber: true,
             company: true,
             address: true,
+            isClear: true,
+            isBlocked: true,
           },
         },
         site: {
