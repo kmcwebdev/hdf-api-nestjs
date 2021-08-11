@@ -9,6 +9,7 @@ import { VisitorService } from './visitor.service';
 
 @Injectable()
 export class MemberService {
+  private mode: string;
   private hdConfirmationMemberOnSite: string;
   private hdConfirmationMemberWorkingFromHome: string;
   private hdConfirmationMemberOnLeave: string;
@@ -17,6 +18,9 @@ export class MemberService {
     private prismaClientService: PrismaClientService,
     private visitorService: VisitorService,
     private config: ConfigService<{
+      env: {
+        mode: string;
+      };
       sendGrid: {
         hdConfirmationMemberOnSite: string;
         hdConfirmationMemberWorkingFromHome: string;
@@ -25,6 +29,9 @@ export class MemberService {
     }>,
     private mailService: MailService,
   ) {
+    this.mode = this.config.get<string>('env.mode', {
+      infer: true,
+    });
     this.hdConfirmationMemberOnSite = this.config.get<string>(
       'sendGrid.hdConfirmationMemberOnSite',
       {
@@ -257,9 +264,14 @@ export class MemberService {
       siteFloor = floor;
     }
 
+    const sendTo =
+      this.mode === 'development'
+        ? 'christian.sulit@kmc.solutions'
+        : 'health@kmc.solutions';
+
     if (workTypeId === 1) {
       await this.mailService.sendEmailWithTemplate({
-        to: !memberNeedsAttention ? email : 'health@kmc.solutions',
+        to: !memberNeedsAttention ? email : sendTo,
         from: 'no-reply@kmc.solutions',
         templateId: this.hdConfirmationMemberOnSite,
         dynamicTemplateData: {
@@ -281,7 +293,7 @@ export class MemberService {
     // Need to add some details
     if (workTypeId === 2) {
       await this.mailService.sendEmailWithTemplate({
-        to: !memberNeedsAttention ? email : 'health@kmc.solutions',
+        to: !memberNeedsAttention ? email : sendTo,
         from: 'no-reply@kmc.solutions',
         templateId: this.hdConfirmationMemberWorkingFromHome,
         dynamicTemplateData: {
@@ -306,7 +318,7 @@ export class MemberService {
         leaveType.type === 'Quarantine leave';
 
       await this.mailService.sendEmailWithTemplate({
-        to: ON_LEAVE_MEMBER_NEEDS_ATTENTION ? 'health@kmc.solutions' : email,
+        to: ON_LEAVE_MEMBER_NEEDS_ATTENTION ? sendTo : email,
         from: 'no-reply@kmc.solutions',
         templateId: this.hdConfirmationMemberOnLeave,
         dynamicTemplateData: {

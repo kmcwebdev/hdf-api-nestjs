@@ -9,6 +9,7 @@ import { VisitorService } from './visitor.service';
 
 @Injectable()
 export class GuestService {
+  private mode: string;
   private hdGuestApproval: string;
   private hdNeedsAttention: string;
 
@@ -16,10 +17,19 @@ export class GuestService {
     private prismaClientService: PrismaClientService,
     private visitorService: VisitorService,
     private config: ConfigService<{
-      sendGrid: { hdGuestApproval: string; hdNeedsAttention: string };
+      env: {
+        mode: string;
+      };
+      sendGrid: {
+        hdGuestApproval: string;
+        hdNeedsAttention: string;
+      };
     }>,
     private mailService: MailService,
   ) {
+    this.mode = this.config.get<string>('env.mode', {
+      infer: true,
+    });
     this.hdGuestApproval = this.config.get<string>('sendGrid.hdGuestApproval', {
       infer: true,
     });
@@ -191,6 +201,11 @@ export class GuestService {
       where: { floorId },
     });
 
+    const sendTo =
+      this.mode === 'development'
+        ? 'christian.sulit@kmc.solutions'
+        : 'health@kmc.solutions';
+
     if (!guestNeedsAttention) {
       await this.mailService.sendEmailWithTemplate({
         to: mailDomainIs(pocEmail, 'kmc.solutions') ? pocEmail : siteEmail,
@@ -221,7 +236,7 @@ export class GuestService {
       });
 
       await this.mailService.sendEmailWithTemplate({
-        to: 'health@kmc.solutions',
+        to: sendTo,
         from: 'no-reply@kmc.solutions',
         templateId: this.hdNeedsAttention,
         dynamicTemplateData: {
