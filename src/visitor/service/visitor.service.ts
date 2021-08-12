@@ -5,6 +5,7 @@ import {
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { Visitor } from '@prisma/client';
+import { currentDate } from 'src/common/utils/current-date.util';
 import { paginate } from 'src/common/utils/paginate.util';
 import { MailService } from 'src/mail/mail.service';
 import { PrismaClientService } from 'src/prisma-client/prisma-client.service';
@@ -17,6 +18,7 @@ import { PTVisitQuery } from '../query/visit.query';
 @Injectable()
 export class VisitorService {
   private dhClearanceStatus: string;
+  private currentDate: Date;
 
   constructor(
     private prismaClientService: PrismaClientService,
@@ -32,6 +34,7 @@ export class VisitorService {
         infer: true,
       },
     );
+    this.currentDate = currentDate();
   }
 
   async getVisits(query: PTVisitQuery) {
@@ -291,14 +294,15 @@ export class VisitorService {
           },
           {
             dateCreated: {
-              gte: new Date(Date.now()),
-              lte: new Date(Date.now()),
+              gte: this.currentDate,
+              lte: this.currentDate,
             },
           },
         ],
       },
       select: {
         id: true,
+        visitId: true,
         guest: true,
         visitor: {
           select: {
@@ -360,6 +364,79 @@ export class VisitorService {
     );
   }
 
+  async getVisitorCurrentVisit(visitId: string) {
+    return await this.prismaClientService.visit.findFirst({
+      where: {
+        visitId,
+        AND: {
+          dateCreated: {
+            gte: this.currentDate,
+            lte: this.currentDate,
+          },
+        },
+      },
+      select: {
+        visitId: true,
+        guest: true,
+        visitorStatus: {
+          select: {
+            isClear: true,
+          },
+        },
+        site: {
+          select: {
+            siteName: true,
+          },
+        },
+        floor: {
+          select: {
+            floor: true,
+          },
+        },
+        workType: {
+          select: {
+            type: true,
+          },
+        },
+        leaveType: {
+          select: {
+            type: true,
+          },
+        },
+        visitor: {
+          select: {
+            firstName: true,
+            lastName: true,
+            email: true,
+            company: true,
+            address: true,
+          },
+        },
+        poc: true,
+        pocEmail: true,
+        purposeOfVisit: true,
+        healthTag: {
+          select: {
+            tag: true,
+          },
+        },
+        surveys: {
+          select: {
+            question: {
+              select: {
+                question: true,
+              },
+            },
+            answers: true,
+          },
+        },
+        travelLocations: true,
+        dateCreated: true,
+        timeCreated: true,
+      },
+    });
+  }
+
   async checkVisitorEmail(email: string) {
     const result = await this.prismaClientService.visitor.findUnique({
       where: { email },
@@ -382,14 +459,21 @@ export class VisitorService {
    * @param {string} email visitor email
    * @param {string} modeOfUse 'Create' if will use to create visit or 'Check' for checking
    */
-  async checkLastVisitorVisitStatus(data: {
+  async checkLastVisitorVisit(data: {
     email: string;
     modeOfUse: 'Create' | 'Check';
   }) {
     const { email, modeOfUse } = data;
 
     const lastVisit = await this.prismaClientService.visitorStatus.findFirst({
-      where: { visitor: { email: { equals: email, mode: 'insensitive' } } },
+      where: {
+        visitor: {
+          email: {
+            equals: email,
+            mode: 'insensitive',
+          },
+        },
+      },
       select: {
         id: true,
         status: true,
@@ -466,7 +550,7 @@ export class VisitorService {
   async clearVisitor(data: { userId: number; email: string; note: string }) {
     const { userId, email, note } = data;
 
-    const lastVisit = await this.checkLastVisitorVisitStatus({
+    const lastVisit = await this.checkLastVisitorVisit({
       email,
       modeOfUse: 'Check',
     });
@@ -483,8 +567,8 @@ export class VisitorService {
         isClear: true,
         status: status === 'Denied' ? status : 'Approved',
         clearedBy: { connect: { id: userId } },
-        dateCleared: new Date(Date.now()),
-        timeCleared: new Date(Date.now()),
+        dateCleared: this.currentDate,
+        timeCleared: this.currentDate,
       },
       select: {
         id: true,

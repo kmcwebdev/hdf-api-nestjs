@@ -24,6 +24,7 @@ import { JwtAuthGuard } from 'src/auth/guard/jwt.guard';
 import { CreateVisitorNoteDTO } from 'src/user/dto/create-visitor-note.dto';
 import { EmailQuery } from 'src/user/query/email.query';
 import { CreateSubEmailsDTO } from 'src/visitor/dto/visitor/create-sub-emails.dto';
+import { CurrentVisitQuery } from '../query/current-visit.query';
 import { PTVisitHistoryQuery } from '../query/visit-history.query';
 import { PTVisitQuery } from '../query/visit.query';
 import { VisitorService } from '../service/visitor.service';
@@ -49,6 +50,14 @@ export class VisitorController {
     return this.visitorService.getVisitHistories(query);
   }
 
+  @Get('visits/current')
+  @UseGuards(JwtAuthGuard)
+  @ApiQuery({ type: CurrentVisitQuery })
+  @ApiOkResponse({ description: 'Success' })
+  getVisitorCurrentVisit(@Query() { visitId }: CurrentVisitQuery) {
+    return this.visitorService.getVisitorCurrentVisit(visitId);
+  }
+
   @Get('visits/:visitId')
   @UseGuards(JwtAuthGuard)
   @ApiParam({ name: 'visitId', description: 'Visit id' })
@@ -63,16 +72,6 @@ export class VisitorController {
   @ApiOkResponse({ description: 'Success' })
   checkVisitorEmail(@Query() { email }: EmailQuery) {
     return this.visitorService.checkVisitorEmail(email);
-  }
-
-  @Get('last-visit')
-  @ApiQuery({ type: EmailQuery })
-  @ApiOkResponse({ description: 'Success' })
-  checkLastVisitorVisitStatus(@Query() { email }: EmailQuery) {
-    return this.visitorService.checkLastVisitorVisitStatus({
-      email,
-      modeOfUse: 'Check',
-    });
   }
 
   @Post('sub-emails')

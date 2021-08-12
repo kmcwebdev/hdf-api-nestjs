@@ -5,6 +5,7 @@ import { format } from 'date-fns';
 import { MailService } from 'src/mail/mail.service';
 import { PrismaClientService } from 'src/prisma-client/prisma-client.service';
 import { CreateMemberVisitorDTO } from 'src/visitor/dto/visitor/member/create-member-visit.dto';
+import { v4 as uuidv4 } from 'uuid';
 import { VisitorService } from './visitor.service';
 
 @Injectable()
@@ -68,11 +69,10 @@ export class MemberService {
       floorId,
     } = data;
 
-    const oldVisitStatus =
-      await this.visitorService.checkLastVisitorVisitStatus({
-        email,
-        modeOfUse: 'Create',
-      });
+    const oldVisitStatus = await this.visitorService.checkLastVisitorVisit({
+      email,
+      modeOfUse: 'Create',
+    });
 
     if (oldVisitStatus?.isClear === false) {
       throw new BadRequestException(
@@ -119,6 +119,7 @@ export class MemberService {
     if (workTypeId === 1) {
       visit = await this.prismaClientService.visit.create({
         data: {
+          visitId: uuidv4(),
           guest: false,
           visitor: { connect: { id: member.id } },
           workType: { connect: { id: workTypeId } },
@@ -133,6 +134,7 @@ export class MemberService {
     if (workTypeId === 2) {
       visit = await this.prismaClientService.visit.create({
         data: {
+          visitId: uuidv4(),
           guest: false,
           visitor: { connect: { id: member.id } },
           workType: { connect: { id: workTypeId } },
@@ -145,6 +147,7 @@ export class MemberService {
     if (workTypeId === 3) {
       visit = await this.prismaClientService.visit.create({
         data: {
+          visitId: uuidv4(),
           guest: false,
           visitor: { connect: { id: member.id } },
           workType: { connect: { id: workTypeId } },
@@ -188,6 +191,7 @@ export class MemberService {
       where: { id: visit.id },
       select: {
         id: true,
+        visitId: true,
         guest: true,
         visitor: {
           select: {
@@ -284,6 +288,7 @@ export class MemberService {
           site: siteName,
           floor: siteFloor,
           status: memberNeedsAttention ? 'Needs attention' : 'Clear',
+          link: `https://health-declaration.kmc.solutions/pdf-result?visitId=${createdVisit.visitId}`,
         },
         groupId: 15220,
         groupsToDisplay: [15220],
@@ -304,6 +309,7 @@ export class MemberService {
           workType: type,
           company,
           status: memberNeedsAttention ? 'Needs attention' : 'Clear',
+          link: `https://health-declaration.kmc.solutions/pdf-result?visitId=${createdVisit.visitId}`,
         },
         groupId: 15220,
         groupsToDisplay: [15220],
@@ -330,11 +336,15 @@ export class MemberService {
           leaveType: leaveType.type,
           company,
           status: ON_LEAVE_MEMBER_NEEDS_ATTENTION ? 'Needs attention' : 'Clear',
+          link: `https://health-declaration.kmc.solutions/pdf-result?visitId=${createdVisit.visitId}`,
         },
         groupId: 15220,
         groupsToDisplay: [15220],
       });
     }
+
+    console.log(createdVisit);
+    console.log(visit);
 
     return createdVisit;
   }

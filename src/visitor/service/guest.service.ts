@@ -5,6 +5,7 @@ import { mailDomainIs } from 'src/common/utils/email-domain-check.util';
 import { MailService } from 'src/mail/mail.service';
 import { PrismaClientService } from 'src/prisma-client/prisma-client.service';
 import { CreateGuestVisitorDTO } from 'src/visitor/dto/visitor/guest/create-guest-visitor.dto';
+import { v4 as uuidv4 } from 'uuid';
 import { VisitorService } from './visitor.service';
 
 @Injectable()
@@ -62,11 +63,10 @@ export class GuestService {
       throw new BadRequestException('Please use the member declaration form.');
     }
 
-    const oldVisitStatus =
-      await this.visitorService.checkLastVisitorVisitStatus({
-        email,
-        modeOfUse: 'Create',
-      });
+    const oldVisitStatus = await this.visitorService.checkLastVisitorVisit({
+      email,
+      modeOfUse: 'Create',
+    });
 
     if (oldVisitStatus?.isClear === false) {
       throw new BadRequestException(
@@ -103,6 +103,7 @@ export class GuestService {
 
     const visit = await this.prismaClientService.visit.create({
       data: {
+        visitId: uuidv4(),
         guest: true,
         visitor: { connect: { id: guest.id } },
         // Manual?
@@ -146,6 +147,7 @@ export class GuestService {
       where: { id: visit.id },
       select: {
         id: true,
+        visitId: true,
         guest: true,
         visitor: {
           select: {
@@ -249,7 +251,6 @@ export class GuestService {
           site: siteName,
           floor,
           status: guestNeedsAttention ? 'Needs attention' : 'Clear',
-          link: 'https://hdf.kmc.solutions',
         },
         groupId: 15220,
         groupsToDisplay: [15220],

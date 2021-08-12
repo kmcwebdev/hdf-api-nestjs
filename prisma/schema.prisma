@@ -5,7 +5,7 @@ datasource db {
 
 generator client {
   provider        = "prisma-client-js"
-  previewFeatures = ["referentialActions"]
+  previewFeatures = ["referentialActions", "interactiveTransactions"]
 }
 
 model User {
@@ -111,7 +111,7 @@ model VisitorStatus {
   visitorId     Int
   visitor       Visitor   @relation(fields: [visitorId], references: [id], onDelete: Cascade)
   visitId       Int?
-  visit         Visit?    @relation(fields: [visitId], references: [id])
+  visit         Visit?    @relation(fields: [visitId], references: [id], onDelete: Cascade)
   status        String    @db.VarChar(100)
   isClear       Boolean
   isClearedById Int?
@@ -128,9 +128,9 @@ model VisitorNote {
   id          Int      @id @default(autoincrement())
   note        String
   visitorId   Int
-  visitor     Visitor  @relation(fields: [visitorId], references: [id])
-  authorId    Int
-  author      User     @relation(fields: [authorId], references: [id])
+  visitor     Visitor  @relation(fields: [visitorId], references: [id], onDelete: Cascade)
+  authorId    Int?
+  author      User?    @relation(fields: [authorId], references: [id], onDelete: SetNull)
   dateCreated DateTime @default(now()) @db.Date
   timeCreated DateTime @default(now()) @db.Timestamptz
 
@@ -146,20 +146,21 @@ model TemperatureTag {
 }
 
 model TempCheckList {
-  id          Int            @id @default(autoincrement())
+  id          Int             @id @default(autoincrement())
   temperature Float
-  tempTagId   Int
-  tag         TemperatureTag @relation(fields: [tempTagId], references: [id])
+  tempTagId   Int?
+  tag         TemperatureTag? @relation(fields: [tempTagId], references: [id], onDelete: SetNull)
   visitorId   Int
-  visitor     Visitor        @relation(fields: [visitorId], references: [id], onDelete: Cascade)
-  dateCreated DateTime       @default(now()) @db.Date
-  timeCreated DateTime       @default(now()) @db.Timestamptz
+  visitor     Visitor         @relation(fields: [visitorId], references: [id], onDelete: Cascade)
+  dateCreated DateTime        @default(now()) @db.Date
+  timeCreated DateTime        @default(now()) @db.Timestamptz
 
   @@map("visitor_temp_check_list")
 }
 
 model Visit {
   id              Int            @id @default(autoincrement())
+  visitId         String         @unique
   guest           Boolean
   visitorId       Int
   visitor         Visitor        @relation(fields: [visitorId], references: [id], onDelete: Cascade)
@@ -203,8 +204,8 @@ model Clearance {
   visitorId    Int
   visitor      Visitor  @relation(fields: [visitorId], references: [id], onDelete: Cascade)
   clearanceUrl String?  @db.VarChar(255)
-  uploadedById Int
-  uploadedBy   User     @relation(fields: [uploadedById], references: [id])
+  uploadedById Int?
+  uploadedBy   User?    @relation(fields: [uploadedById], references: [id], onDelete: SetNull)
   notes        String
   dateCreated  DateTime @default(now()) @db.Date
   timeCreated  DateTime @default(now()) @db.Timestamptz
@@ -264,10 +265,10 @@ model Event {
   dateFrom      DateTime @db.Date
   dateTo        DateTime @db.Date
   time          DateTime @db.Timestamptz
-  siteId        Int
-  site          Site     @relation(fields: [siteId], references: [siteId])
-  floorId       Int
-  floor         Floor    @relation(fields: [floorId], references: [floorId])
+  siteId        Int?
+  site          Site?    @relation(fields: [siteId], references: [siteId], onDelete: SetNull)
+  floorId       Int?
+  floor         Floor?   @relation(fields: [floorId], references: [floorId], onDelete: SetNull)
   contactPerson String   @db.VarChar(100)
   contactEmail  String   @db.VarChar(100)
 
