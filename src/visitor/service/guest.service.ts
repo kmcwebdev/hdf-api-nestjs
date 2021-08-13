@@ -147,7 +147,6 @@ export class GuestService {
       where: { id: visit.id },
       select: {
         id: true,
-        visitId: true,
         guest: true,
         visitor: {
           select: {
