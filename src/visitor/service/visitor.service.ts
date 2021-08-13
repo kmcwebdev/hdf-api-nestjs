@@ -383,6 +383,7 @@ export class VisitorService {
         visitorStatus: {
           select: {
             isClear: true,
+            status: true,
           },
         },
         site: {
@@ -430,6 +431,9 @@ export class VisitorService {
               },
             },
             answers: true,
+          },
+          orderBy: {
+            id: 'asc',
           },
         },
         travelLocations: true,

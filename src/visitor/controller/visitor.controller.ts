@@ -51,7 +51,6 @@ export class VisitorController {
   }
 
   @Get('visits/current')
-  @UseGuards(JwtAuthGuard)
   @ApiQuery({ type: CurrentVisitQuery })
   @ApiOkResponse({ description: 'Success' })
   getVisitorCurrentVisit(@Query() { visitId }: CurrentVisitQuery) {
