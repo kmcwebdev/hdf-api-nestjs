@@ -12,6 +12,7 @@ import sendgridEnv from './common/config/sengrid.config';
 import tinifyEnv from './common/config/tinify.config';
 import { EventModule } from './event/event.module';
 import { FileModule } from './file/file.module';
+import { FilterConfigModule } from './filter-config/filter-config.module';
 import { MailModule } from './mail/mail.module';
 import { MiscModule } from './misc/misc.module';
 import { PrismaClientModule } from './prisma-client/prisma-client.module';
@@ -20,7 +21,6 @@ import { SiteModule } from './site/site.module';
 import { UserModule } from './user/user.module';
 import { VisitEventGatewayModule } from './visit-event-gateway/visit-event-gateway.module';
 import { VisitorModule } from './visitor/visitor.module';
-import { FilterConfigModule } from './filter-config/filter-config.module';
 
 @Module({
   imports: [

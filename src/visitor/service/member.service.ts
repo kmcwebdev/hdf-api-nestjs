@@ -2,6 +2,7 @@ import { BadRequestException, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { LeaveType, Visit } from '@prisma/client';
 import { format } from 'date-fns';
+import { currentDate } from 'src/common/utils/current-date.util';
 import { MailService } from 'src/mail/mail.service';
 import { PrismaClientService } from 'src/prisma-client/prisma-client.service';
 import { CreateMemberVisitorDTO } from 'src/visitor/dto/visitor/member/create-member-visit.dto';
@@ -11,6 +12,7 @@ import { VisitorService } from './visitor.service';
 @Injectable()
 export class MemberService {
   private mode: string;
+  private currentDate: Date;
   private hdConfirmationMemberOnSite: string;
   private hdConfirmationMemberWorkingFromHome: string;
   private hdConfirmationMemberOnLeave: string;
@@ -33,6 +35,7 @@ export class MemberService {
     this.mode = this.config.get<string>('env.mode', {
       infer: true,
     });
+    this.currentDate = currentDate();
     this.hdConfirmationMemberOnSite = this.config.get<string>(
       'sendGrid.hdConfirmationMemberOnSite',
       {
@@ -342,9 +345,6 @@ export class MemberService {
         groupsToDisplay: [15220],
       });
     }
-
-    console.log(createdVisit);
-    console.log(visit);
 
     return createdVisit;
   }

@@ -75,6 +75,7 @@ export class VisitorService {
         where,
         select: {
           id: true,
+          visitId: true,
           guest: true,
           visitor: {
             select: {
@@ -123,6 +124,7 @@ export class VisitorService {
       where: { id: visitId },
       select: {
         id: true,
+        visitId: true,
         guest: true,
         workType: true,
         leaveType: true,
