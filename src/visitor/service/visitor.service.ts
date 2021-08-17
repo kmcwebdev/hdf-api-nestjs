@@ -433,7 +433,7 @@ export class VisitorService {
             answers: true,
           },
           orderBy: {
-            id: 'asc',
+            id: 'desc',
           },
         },
         travelLocations: true,
