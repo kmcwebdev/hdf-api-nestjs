@@ -275,6 +275,10 @@ export class UserService {
       select: { id: true, email: true, userType: true },
     });
 
+    await this.prismaClientService.userSiteFilter.create({
+      data: { user: { connect: { id: result.id } } },
+    });
+
     return result;
   }
 
@@ -322,6 +326,10 @@ export class UserService {
         },
         userType: true,
       },
+    });
+
+    await this.prismaClientService.userSiteFilter.create({
+      data: { user: { connect: { id: result.id } } },
     });
 
     return result;
