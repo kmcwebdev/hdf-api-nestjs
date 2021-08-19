@@ -176,7 +176,7 @@ export class VisitorService {
     });
   }
 
-  async getVisitHistories(query: PTVisitHistoryQuery) {
+  async getVisitsHistory(query: PTVisitHistoryQuery) {
     const { visitorId } = query;
 
     const { siteId, dateFrom, dateTo, timeFrom, timeTo } = query;
@@ -218,6 +218,7 @@ export class VisitorService {
         take: limit,
         where,
         select: {
+          id: true,
           site: {
             select: {
               siteName: true,

@@ -42,12 +42,12 @@ export class VisitorController {
     return this.visitorService.getVisits(query);
   }
 
-  @Get('visits/histories')
+  @Get('visits/history')
   @UseGuards(JwtAuthGuard)
   @ApiQuery({ type: PTVisitHistoryQuery, required: false })
   @ApiOkResponse({ description: 'Success' })
-  getVisitHistories(@Query() query: PTVisitHistoryQuery) {
-    return this.visitorService.getVisitHistories(query);
+  getVisitsHistory(@Query() query: PTVisitHistoryQuery) {
+    return this.visitorService.getVisitsHistory(query);
   }
 
   @Get('visits/current')
