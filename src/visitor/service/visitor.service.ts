@@ -554,6 +554,21 @@ export class VisitorService {
     });
   }
 
+  async addTemperature(data: { visitorId: number; temperature: number }) {
+    const { visitorId, temperature } = data;
+
+    return await this.prismaClientService.tempCheckList.create({
+      data: {
+        temperature,
+        visitor: {
+          connect: {
+            id: visitorId,
+          },
+        },
+      },
+    });
+  }
+
   async clearVisitor(data: { userId: number; email: string; note: string }) {
     const { userId, email, note } = data;
 
