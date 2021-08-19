@@ -24,6 +24,7 @@ import { JwtAuthGuard } from 'src/auth/guard/jwt.guard';
 import { CreateVisitorNoteDTO } from 'src/user/dto/create-visitor-note.dto';
 import { EmailQuery } from 'src/user/query/email.query';
 import { CreateSubEmailsDTO } from 'src/visitor/dto/visitor/create-sub-emails.dto';
+import { CreateTemperatureDTO } from '../dto/create-temperature.dto';
 import { CurrentVisitQuery } from '../query/current-visit.query';
 import { PTVisitHistoryQuery } from '../query/visit-history.query';
 import { PTVisitQuery } from '../query/visit.query';
@@ -94,6 +95,16 @@ export class VisitorController {
       authorId: req.user.id,
       note,
     });
+  }
+
+  @Post('temperature')
+  @ApiQuery({ name: 'visitorId', description: 'Visitor id' })
+  @ApiCreatedResponse({ description: 'Created' })
+  addTemperature(
+    @Query('visitorId', new ParseIntPipe()) visitorId: number,
+    @Body() { temperature }: CreateTemperatureDTO,
+  ) {
+    return this.visitorService.addTemperature({ visitorId, temperature });
   }
 
   @Patch('clear')

@@ -560,11 +560,19 @@ export class VisitorService {
     return await this.prismaClientService.tempCheckList.create({
       data: {
         temperature,
+        tag: {
+          connect: {
+            id: temperature >= 38 ? 2 : 1,
+          },
+        },
         visitor: {
           connect: {
             id: visitorId,
           },
         },
+      },
+      select: {
+        temperature: true,
       },
     });
   }
