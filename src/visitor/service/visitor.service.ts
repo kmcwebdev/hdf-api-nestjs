@@ -12,8 +12,10 @@ import { PrismaClientService } from 'src/prisma-client/prisma-client.service';
 import { CreateSubEmailsDTO } from 'src/visitor/dto/visitor/create-sub-emails.dto';
 import { CreateVisitorDTO } from 'src/visitor/dto/visitor/create-visitor.dto';
 import { QuestionDTO } from '../dto/visitor/question.dto';
+import { PTTemperatureChecklistQuery } from '../query/temperature-checlist.query';
 import { PTVisitHistoryQuery } from '../query/visit-history.query';
 import { PTVisitQuery } from '../query/visit.query';
+import { PTVisitorNoteQuery } from '../query/visitor-note.query';
 
 @Injectable()
 export class VisitorService {
@@ -177,9 +179,7 @@ export class VisitorService {
   }
 
   async getVisitsHistory(query: PTVisitHistoryQuery) {
-    const { visitorId } = query;
-
-    const { siteId, dateFrom, dateTo, timeFrom, timeTo } = query;
+    const { visitorId, siteId, dateFrom, dateTo, timeFrom, timeTo } = query;
 
     const { page, limit, skip } = paginate(query.page, query.limit);
 
@@ -522,8 +522,26 @@ export class VisitorService {
     return lastVisit;
   }
 
-  async updateVisitor() {
-    return true;
+  async blockVisitor(visitorId: number) {
+    return await this.prismaClientService.visitor.update({
+      where: { id: visitorId },
+      data: { isBlocked: true },
+      select: {
+        id: true,
+        isBlocked: true,
+      },
+    });
+  }
+
+  async unblockVisitor(visitorId: number) {
+    return await this.prismaClientService.visitor.update({
+      where: { id: visitorId },
+      data: { isBlocked: false },
+      select: {
+        id: true,
+        isBlocked: true,
+      },
+    });
   }
 
   async createVisitorSubEmails(data: CreateSubEmailsDTO) {
@@ -534,24 +552,136 @@ export class VisitorService {
     });
   }
 
+  async getVisitorNotes(query: PTVisitorNoteQuery) {
+    const { page, limit, skip } = paginate(query.page, query.limit);
+
+    const { visitorId } = query;
+
+    const where = {
+      visitorId: { equals: visitorId },
+    };
+
+    const result = await this.prismaClientService.$transaction([
+      this.prismaClientService.visitorNote.findMany({
+        skip,
+        take: limit,
+        where,
+        select: {
+          id: true,
+          author: {
+            select: {
+              profile: {
+                select: {
+                  firstName: true,
+                  lastName: true,
+                },
+              },
+            },
+          },
+          note: true,
+          createdAt: true,
+        },
+        orderBy: {
+          id: 'desc',
+        },
+      }),
+      this.prismaClientService.visitorNote.count({ where }),
+    ]);
+
+    return {
+      data: result[0],
+      pagination: {
+        page,
+        limit,
+        count: result[1],
+      },
+    };
+  }
+
   async createVisitorNote(data: {
-    userId: number;
+    visitorId: number;
     authorId: number;
     note: string;
   }) {
-    const { userId, authorId, note } = data;
+    const { visitorId, authorId, note } = data;
 
     return await this.prismaClientService.visitorNote.create({
       data: {
         note,
         authorId,
-        visitorId: userId,
+        visitorId,
       },
       select: {
         id: true,
+        author: {
+          select: {
+            profile: {
+              select: {
+                firstName: true,
+                lastName: true,
+              },
+            },
+          },
+        },
         note: true,
+        createdAt: true,
       },
     });
+  }
+
+  async getTemperatureChecklist(query: PTTemperatureChecklistQuery) {
+    const { visitorId, temperature, dateFrom, dateTo, timeFrom, timeTo } =
+      query;
+
+    const { page, limit, skip } = paginate(query.page, query.limit);
+
+    const where = {
+      visitorId: { equals: visitorId },
+      temperature: {
+        gte: temperature,
+        lte: temperature,
+      },
+      dateCreated: {
+        gte: dateFrom ? new Date(dateFrom) : undefined,
+        lte: dateTo ? new Date(dateTo) : undefined,
+      },
+      timeCreated: {
+        gte: timeFrom ? new Date(timeFrom) : undefined,
+        lte: timeTo ? new Date(timeTo) : undefined,
+      },
+    };
+
+    const result = await this.prismaClientService.$transaction([
+      this.prismaClientService.tempCheckList.findMany({
+        skip,
+        take: limit,
+        where,
+        select: {
+          id: true,
+          temperature: true,
+          tag: {
+            select: {
+              tag: true,
+            },
+          },
+          dateCreated: true,
+          timeCreated: true,
+        },
+        orderBy: {
+          id: 'desc',
+        },
+      }),
+      this.prismaClientService.tempCheckList.count({ where }),
+    ]);
+
+    return {
+      data: result[0],
+      pagination: {
+        page,
+        limit,
+        count: result[1],
+      },
+    };
   }
 
   async addTemperature(data: { visitorId: number; temperature: number }) {

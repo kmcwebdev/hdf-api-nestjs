@@ -125,14 +125,13 @@ model VisitorStatus {
 }
 
 model VisitorNote {
-  id          Int      @id @default(autoincrement())
-  note        String
-  visitorId   Int
-  visitor     Visitor  @relation(fields: [visitorId], references: [id], onDelete: Cascade)
-  authorId    Int?
-  author      User?    @relation(fields: [authorId], references: [id], onDelete: SetNull)
-  dateCreated DateTime @default(now()) @db.Date
-  timeCreated DateTime @default(now()) @db.Timestamptz
+  id        Int      @id @default(autoincrement())
+  note      String
+  visitorId Int
+  visitor   Visitor  @relation(fields: [visitorId], references: [id], onDelete: Cascade)
+  authorId  Int?
+  author    User?    @relation(fields: [authorId], references: [id], onDelete: SetNull)
+  createdAt DateTime @default(now())
 
   @@map("visitor_notes")
 }

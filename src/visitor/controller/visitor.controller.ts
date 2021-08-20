@@ -26,8 +26,10 @@ import { EmailQuery } from 'src/user/query/email.query';
 import { CreateSubEmailsDTO } from 'src/visitor/dto/visitor/create-sub-emails.dto';
 import { CreateTemperatureDTO } from '../dto/create-temperature.dto';
 import { CurrentVisitQuery } from '../query/current-visit.query';
+import { PTTemperatureChecklistQuery } from '../query/temperature-checlist.query';
 import { PTVisitHistoryQuery } from '../query/visit-history.query';
 import { PTVisitQuery } from '../query/visit.query';
+import { PTVisitorNoteQuery } from '../query/visitor-note.query';
 import { VisitorService } from '../service/visitor.service';
 
 @ApiTags('Visitor')
@@ -81,23 +83,54 @@ export class VisitorController {
     return this.visitorService.createVisitorSubEmails(data);
   }
 
+  @Patch('blocked')
+  @UseGuards(JwtAuthGuard)
+  @ApiQuery({ name: 'visitorId', description: 'Visitor id' })
+  @ApiOkResponse({ description: 'Success' })
+  blockVisitor(@Query('visitorId', new ParseIntPipe()) visitorId: number) {
+    return this.visitorService.blockVisitor(visitorId);
+  }
+
+  @Patch('unblocked')
+  @UseGuards(JwtAuthGuard)
+  @ApiQuery({ name: 'visitorId', description: 'Visitor id' })
+  @ApiOkResponse({ description: 'Success' })
+  unblockVisitor(@Query('visitorId', new ParseIntPipe()) visitorId: number) {
+    return this.visitorService.unblockVisitor(visitorId);
+  }
+
+  @Get('notes')
+  @UseGuards(JwtAuthGuard)
+  @ApiQuery({ type: PTVisitorNoteQuery, required: false })
+  @ApiOkResponse({ description: 'Success' })
+  getVisitorNotes(@Query() query: PTVisitorNoteQuery) {
+    return this.visitorService.getVisitorNotes(query);
+  }
+
   @Post('notes')
   @UseGuards(JwtAuthGuard)
-  @ApiQuery({ name: 'userId', description: 'User id' })
+  @ApiQuery({ name: 'visitorId', description: 'Visitor id' })
   @ApiCreatedResponse({ description: 'Created' })
   createVisitorNote(
     @Req() req: Request,
-    @Query('userId', new ParseIntPipe()) userId: number,
+    @Query('visitorId', new ParseIntPipe()) visitorId: number,
     @Body() { note }: CreateVisitorNoteDTO,
   ) {
     return this.visitorService.createVisitorNote({
-      userId,
+      visitorId,
       authorId: req.user.id,
       note,
     });
   }
 
-  @Post('temperature')
+  @Get('temperatures')
+  @ApiQuery({ type: PTTemperatureChecklistQuery, required: false })
+  @ApiOkResponse({ description: 'Success' })
+  getUsers(@Query() query: PTTemperatureChecklistQuery) {
+    return this.visitorService.getTemperatureChecklist(query);
+  }
+
+  @Post('temperatures')
   @ApiQuery({ name: 'visitorId', description: 'Visitor id' })
   @ApiCreatedResponse({ description: 'Created' })
   addTemperature(
