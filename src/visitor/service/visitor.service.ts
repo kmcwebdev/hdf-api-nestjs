@@ -9,6 +9,7 @@ import { currentDate } from 'src/common/utils/current-date.util';
 import { paginate } from 'src/common/utils/paginate.util';
 import { MailService } from 'src/mail/mail.service';
 import { PrismaClientService } from 'src/prisma-client/prisma-client.service';
+import { User } from 'src/user/entity/user.entity';
 import { CreateSubEmailsDTO } from 'src/visitor/dto/visitor/create-sub-emails.dto';
 import { CreateVisitorDTO } from 'src/visitor/dto/visitor/create-visitor.dto';
 import { QuestionDTO } from '../dto/visitor/question.dto';
@@ -39,7 +40,7 @@ export class VisitorService {
     this.currentDate = currentDate();
   }
 
-  async getVisits(query: PTVisitQuery) {
+  async getVisits(user: User, query: PTVisitQuery) {
     const {
       firstName,
       lastName,
@@ -53,6 +54,8 @@ export class VisitorService {
     } = query;
 
     const { page, limit, skip } = paginate(query.page, query.limit);
+
+    console.log(user);
 
     const where = {
       guest: { equals: guest },

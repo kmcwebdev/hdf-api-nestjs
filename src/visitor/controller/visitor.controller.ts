@@ -41,8 +41,8 @@ export class VisitorController {
   @UseGuards(JwtAuthGuard)
   @ApiQuery({ type: PTVisitQuery, required: false })
   @ApiOkResponse({ description: 'Success' })
-  getVisits(@Query() query: PTVisitQuery) {
-    return this.visitorService.getVisits(query);
+  getVisits(@Req() req: Request, @Query() query: PTVisitQuery) {
+    return this.visitorService.getVisits(req.user, query);
   }
 
   @Get('visits/history')
