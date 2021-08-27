@@ -371,6 +371,8 @@ export class VisitorService {
   }
 
   async getVisitorCurrentVisit(visitId: string) {
+    console.log(this.currentDate);
+
     return await this.prismaClientService.visit.findFirst({
       where: {
         visitId,
