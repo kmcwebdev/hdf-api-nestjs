@@ -160,6 +160,7 @@ export class MemberService {
           site: { connect: { siteId } },
           floor: { connect: { floorId } },
           healthTag: { connect: { id: healthTag.id } },
+          dateCreated: new Date(Date.now()),
         },
       });
     }

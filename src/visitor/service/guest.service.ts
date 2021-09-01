@@ -114,6 +114,7 @@ export class GuestService {
         pocEmail,
         purposeOfVisit,
         healthTag: { connect: { id: healthTag.id } },
+        dateCreated: new Date(Date.now()),
       },
     });
 
