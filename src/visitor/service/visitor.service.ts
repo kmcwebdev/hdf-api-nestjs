@@ -13,7 +13,7 @@ import { User } from 'src/user/entity/user.entity';
 import { CreateSubEmailsDTO } from 'src/visitor/dto/visitor/create-sub-emails.dto';
 import { CreateVisitorDTO } from 'src/visitor/dto/visitor/create-visitor.dto';
 import { QuestionDTO } from '../dto/visitor/question.dto';
-import { PTTemperatureChecklistQuery } from '../query/temperature-checlist.query';
+import { PTTemperatureChecklistQuery } from '../query/temperature-checklist.query';
 import { PTVisitHistoryQuery } from '../query/visit-history.query';
 import { PTVisitQuery } from '../query/visit.query';
 import { PTVisitorNoteQuery } from '../query/visitor-note.query';

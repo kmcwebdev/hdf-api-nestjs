@@ -121,7 +121,7 @@ export class MemberService {
 
     let visit: Visit;
 
-    console.log(new Date(Date.now()).toLocaleDateString());
+    console.log(this.currentDate);
 
     if (workTypeId === 1) {
       visit = await this.prismaClientService.visit.create({
@@ -134,7 +134,7 @@ export class MemberService {
           site: { connect: { siteId } },
           floor: { connect: { floorId } },
           healthTag: { connect: { id: healthTag.id } },
-          dateCreated: new Date(Date.now()).toLocaleDateString(),
+          dateCreated: this.currentDate,
         },
       });
     }
@@ -148,7 +148,7 @@ export class MemberService {
           workType: { connect: { id: workTypeId } },
           travelLocations: [travelLocations],
           healthTag: { connect: { id: healthTag.id } },
-          dateCreated: new Date(Date.now()).toLocaleDateString(),
+          dateCreated: this.currentDate,
         },
       });
     }
@@ -166,7 +166,7 @@ export class MemberService {
           site: { connect: { siteId } },
           floor: { connect: { floorId } },
           healthTag: { connect: { id: healthTag.id } },
-          dateCreated: new Date(Date.now()).toLocaleDateString(),
+          dateCreated: this.currentDate,
         },
       });
     }

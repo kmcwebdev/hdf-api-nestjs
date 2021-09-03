@@ -26,7 +26,7 @@ import { EmailQuery } from 'src/user/query/email.query';
 import { CreateSubEmailsDTO } from 'src/visitor/dto/visitor/create-sub-emails.dto';
 import { CreateTemperatureDTO } from '../dto/create-temperature.dto';
 import { CurrentVisitQuery } from '../query/current-visit.query';
-import { PTTemperatureChecklistQuery } from '../query/temperature-checlist.query';
+import { PTTemperatureChecklistQuery } from '../query/temperature-checklist.query';
 import { PTVisitHistoryQuery } from '../query/visit-history.query';
 import { PTVisitQuery } from '../query/visit.query';
 import { PTVisitorNoteQuery } from '../query/visitor-note.query';
