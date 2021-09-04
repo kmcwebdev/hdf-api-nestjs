@@ -5,10 +5,7 @@ import {
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { Visitor } from '@prisma/client';
-import {
-  currentDate,
-  testCurrentDate,
-} from 'src/common/utils/current-date.util';
+import { currentDate } from 'src/common/utils/current-date.util';
 import { paginate } from 'src/common/utils/paginate.util';
 import { MailService } from 'src/mail/mail.service';
 import { PrismaClientService } from 'src/prisma-client/prisma-client.service';
@@ -25,7 +22,6 @@ import { PTVisitorNoteQuery } from '../query/visitor-note.query';
 export class VisitorService {
   private dhClearanceStatus: string;
   private currentDate: Date;
-  private shitDate: Date;
 
   constructor(
     private prismaClientService: PrismaClientService,
@@ -42,7 +38,6 @@ export class VisitorService {
       },
     );
     this.currentDate = currentDate();
-    this.shitDate = testCurrentDate();
   }
 
   async getVisits(user: User, query: PTVisitQuery) {
@@ -287,7 +282,6 @@ export class VisitorService {
     const { siteId, visitorId, isGuest } = data;
 
     console.log(this.currentDate);
-    console.log(this.shitDate);
 
     const duplicateVisit = await this.prismaClientService.visit.findFirst({
       where: {
@@ -306,8 +300,8 @@ export class VisitorService {
           },
           {
             dateCreated: {
-              gte: this.shitDate,
-              lte: this.shitDate,
+              gte: this.currentDate,
+              lte: this.currentDate,
             },
           },
         ],
@@ -384,8 +378,8 @@ export class VisitorService {
         visitId,
         AND: {
           dateCreated: {
-            gte: this.shitDate,
-            lte: this.shitDate,
+            gte: this.currentDate,
+            lte: this.currentDate,
           },
         },
       },
@@ -738,8 +732,8 @@ export class VisitorService {
         isClear: true,
         status: status === 'Denied' ? status : 'Approved',
         clearedBy: { connect: { id: userId } },
-        dateCleared: this.shitDate,
-        timeCleared: this.shitDate,
+        dateCleared: this.currentDate,
+        timeCleared: this.currentDate,
       },
       select: {
         id: true,

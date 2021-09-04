@@ -1,7 +1,7 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { format } from 'date-fns';
-import { testCurrentDate } from 'src/common/utils/current-date.util';
+import { currentDate } from 'src/common/utils/current-date.util';
 import { mailDomainIs } from 'src/common/utils/email-domain-check.util';
 import { MailService } from 'src/mail/mail.service';
 import { PrismaClientService } from 'src/prisma-client/prisma-client.service';
@@ -14,7 +14,7 @@ export class GuestService {
   private mode: string;
   private hdGuestApproval: string;
   private hdNeedsAttention: string;
-  private shitDate: Date;
+  private currentDate: Date;
 
   constructor(
     private prismaClientService: PrismaClientService,
@@ -42,7 +42,7 @@ export class GuestService {
         infer: true,
       },
     );
-    this.shitDate = testCurrentDate();
+    this.currentDate = currentDate();
   }
 
   async createGuestVisitor(data: CreateGuestVisitorDTO) {
@@ -117,7 +117,7 @@ export class GuestService {
         pocEmail,
         purposeOfVisit,
         healthTag: { connect: { id: healthTag.id } },
-        dateCreated: this.shitDate,
+        dateCreated: this.currentDate,
       },
     });
 
