@@ -306,8 +306,8 @@ export class VisitorService {
           },
           {
             dateCreated: {
-              gte: this.currentDate,
-              lte: this.currentDate,
+              gte: this.shitDate,
+              lte: this.shitDate,
             },
           },
         ],
@@ -384,8 +384,8 @@ export class VisitorService {
         visitId,
         AND: {
           dateCreated: {
-            gte: this.currentDate,
-            lte: this.currentDate,
+            gte: this.shitDate,
+            lte: this.shitDate,
           },
         },
       },
@@ -738,8 +738,8 @@ export class VisitorService {
         isClear: true,
         status: status === 'Denied' ? status : 'Approved',
         clearedBy: { connect: { id: userId } },
-        dateCleared: this.currentDate,
-        timeCleared: this.currentDate,
+        dateCleared: this.shitDate,
+        timeCleared: this.shitDate,
       },
       select: {
         id: true,
