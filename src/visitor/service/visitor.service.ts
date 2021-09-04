@@ -5,7 +5,10 @@ import {
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { Visitor } from '@prisma/client';
-import { currentDate } from 'src/common/utils/current-date.util';
+import {
+  currentDate,
+  testCurrentDate,
+} from 'src/common/utils/current-date.util';
 import { paginate } from 'src/common/utils/paginate.util';
 import { MailService } from 'src/mail/mail.service';
 import { PrismaClientService } from 'src/prisma-client/prisma-client.service';
@@ -22,6 +25,7 @@ import { PTVisitorNoteQuery } from '../query/visitor-note.query';
 export class VisitorService {
   private dhClearanceStatus: string;
   private currentDate: Date;
+  private shitDate: Date;
 
   constructor(
     private prismaClientService: PrismaClientService,
@@ -38,6 +42,7 @@ export class VisitorService {
       },
     );
     this.currentDate = currentDate();
+    this.shitDate = testCurrentDate();
   }
 
   async getVisits(user: User, query: PTVisitQuery) {
@@ -280,6 +285,9 @@ export class VisitorService {
     isGuest: boolean;
   }) {
     const { siteId, visitorId, isGuest } = data;
+
+    console.log(this.currentDate);
+    console.log(this.shitDate);
 
     const duplicateVisit = await this.prismaClientService.visit.findFirst({
       where: {
