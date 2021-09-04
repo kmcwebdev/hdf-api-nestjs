@@ -2,7 +2,7 @@ import { BadRequestException, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { LeaveType, Visit } from '@prisma/client';
 import { format } from 'date-fns';
-import { currentDate } from 'src/common/utils/current-date.util';
+import { testCurrentDate } from 'src/common/utils/current-date.util';
 import { MailService } from 'src/mail/mail.service';
 import { PrismaClientService } from 'src/prisma-client/prisma-client.service';
 import { CreateMemberVisitorDTO } from 'src/visitor/dto/visitor/member/create-member-visit.dto';
@@ -12,7 +12,7 @@ import { VisitorService } from './visitor.service';
 @Injectable()
 export class MemberService {
   private mode: string;
-  private currentDate: Date;
+  private shitDate: Date;
   private hdConfirmationMemberOnSite: string;
   private hdConfirmationMemberWorkingFromHome: string;
   private hdConfirmationMemberOnLeave: string;
@@ -35,7 +35,6 @@ export class MemberService {
     this.mode = this.config.get<string>('env.mode', {
       infer: true,
     });
-    this.currentDate = currentDate();
     this.hdConfirmationMemberOnSite = this.config.get<string>(
       'sendGrid.hdConfirmationMemberOnSite',
       {
@@ -54,6 +53,7 @@ export class MemberService {
         infer: true,
       },
     );
+    this.shitDate = testCurrentDate();
   }
 
   async createMemberVisitor(data: CreateMemberVisitorDTO) {
@@ -121,7 +121,7 @@ export class MemberService {
 
     let visit: Visit;
 
-    console.log(this.currentDate);
+    console.log(this.shitDate);
 
     if (workTypeId === 1) {
       visit = await this.prismaClientService.visit.create({
@@ -134,7 +134,7 @@ export class MemberService {
           site: { connect: { siteId } },
           floor: { connect: { floorId } },
           healthTag: { connect: { id: healthTag.id } },
-          dateCreated: this.currentDate,
+          dateCreated: this.shitDate,
         },
       });
     }
@@ -148,7 +148,7 @@ export class MemberService {
           workType: { connect: { id: workTypeId } },
           travelLocations: [travelLocations],
           healthTag: { connect: { id: healthTag.id } },
-          dateCreated: this.currentDate,
+          dateCreated: this.shitDate,
         },
       });
     }
@@ -166,7 +166,7 @@ export class MemberService {
           site: { connect: { siteId } },
           floor: { connect: { floorId } },
           healthTag: { connect: { id: healthTag.id } },
-          dateCreated: this.currentDate,
+          dateCreated: this.shitDate,
         },
       });
     }

@@ -5,3 +5,10 @@ export function currentDate() {
 
   return new Date(date);
 }
+
+export function testCurrentDate() {
+  const today = new Date();
+  const tomorrow = new Date();
+
+  return new Date(tomorrow.setDate(today.getDate() + 1));
+}
