@@ -55,6 +55,8 @@ export class VisitorService {
 
     const { page, limit, skip } = paginate(query.page, query.limit);
 
+    console.log(query);
+
     const where = {
       guest: { equals: guest },
       visitor: {

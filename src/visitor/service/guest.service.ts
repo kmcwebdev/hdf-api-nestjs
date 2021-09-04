@@ -262,4 +262,8 @@ export class GuestService {
 
     return guestVisit;
   }
+
+  async approvedGuest() {
+    return true;
+  }
 }
