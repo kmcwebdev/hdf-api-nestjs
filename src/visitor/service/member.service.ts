@@ -106,8 +106,6 @@ export class MemberService {
     });
 
     if (duplicateVisit) {
-      console.log('duplicate-visit', duplicateVisit);
-
       return duplicateVisit;
     }
 
@@ -120,8 +118,6 @@ export class MemberService {
     });
 
     let visit: Visit;
-
-    console.log(this.currentDate);
 
     if (workTypeId === 1) {
       visit = await this.prismaClientService.visit.create({

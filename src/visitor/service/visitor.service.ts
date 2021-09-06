@@ -283,8 +283,6 @@ export class VisitorService {
   }) {
     const { siteId, visitorId, isGuest } = data;
 
-    console.log(this.currentDate);
-
     const duplicateVisit = await this.prismaClientService.visit.findFirst({
       where: {
         AND: [
@@ -373,15 +371,12 @@ export class VisitorService {
   }
 
   async getVisitorCurrentVisit(visitId: string) {
-    console.log(this.currentDate);
-
     return await this.prismaClientService.visit.findFirst({
       where: {
         visitId,
         AND: {
           dateCreated: {
-            gte: this.currentDate,
-            lte: this.currentDate,
+            equals: this.currentDate,
           },
         },
       },
