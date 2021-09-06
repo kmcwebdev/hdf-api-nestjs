@@ -179,7 +179,7 @@ model Visit {
   travelLocations String[]
   healthTagId     Int
   healthTag       HealthTag      @relation(fields: [healthTagId], references: [id])
-  dateCreated     DateTime       @db.Date
+  dateCreated     DateTime       @default(now()) @db.Date
   timeCreated     DateTime       @default(now()) @db.Timestamptz
 
   @@map("visits")

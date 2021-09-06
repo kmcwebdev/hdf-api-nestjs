@@ -130,7 +130,6 @@ export class MemberService {
           site: { connect: { siteId } },
           floor: { connect: { floorId } },
           healthTag: { connect: { id: healthTag.id } },
-          dateCreated: this.currentDate,
         },
       });
     }
@@ -144,7 +143,6 @@ export class MemberService {
           workType: { connect: { id: workTypeId } },
           travelLocations: [travelLocations],
           healthTag: { connect: { id: healthTag.id } },
-          dateCreated: this.currentDate,
         },
       });
     }
@@ -162,7 +160,6 @@ export class MemberService {
           site: { connect: { siteId } },
           floor: { connect: { floorId } },
           healthTag: { connect: { id: healthTag.id } },
-          dateCreated: this.currentDate,
         },
       });
     }
