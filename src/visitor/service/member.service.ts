@@ -2,7 +2,6 @@ import { BadRequestException, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { LeaveType, Visit } from '@prisma/client';
 import { format } from 'date-fns';
-import { currentDate } from 'src/common/utils/current-date.util';
 import { MailService } from 'src/mail/mail.service';
 import { PrismaClientService } from 'src/prisma-client/prisma-client.service';
 import { CreateMemberVisitorDTO } from 'src/visitor/dto/visitor/member/create-member-visit.dto';
@@ -12,7 +11,6 @@ import { VisitorService } from './visitor.service';
 @Injectable()
 export class MemberService {
   private mode: string;
-  private currentDate: Date;
   private hdConfirmationMemberOnSite: string;
   private hdConfirmationMemberWorkingFromHome: string;
   private hdConfirmationMemberOnLeave: string;
@@ -53,7 +51,6 @@ export class MemberService {
         infer: true,
       },
     );
-    this.currentDate = currentDate();
   }
 
   async createMemberVisitor(data: CreateMemberVisitorDTO) {
@@ -130,7 +127,6 @@ export class MemberService {
           site: { connect: { siteId } },
           floor: { connect: { floorId } },
           healthTag: { connect: { id: healthTag.id } },
-          dateCreated: this.currentDate,
         },
       });
     }
@@ -144,7 +140,6 @@ export class MemberService {
           workType: { connect: { id: workTypeId } },
           travelLocations: [travelLocations],
           healthTag: { connect: { id: healthTag.id } },
-          dateCreated: this.currentDate,
         },
       });
     }
@@ -162,7 +157,6 @@ export class MemberService {
           site: { connect: { siteId } },
           floor: { connect: { floorId } },
           healthTag: { connect: { id: healthTag.id } },
-          dateCreated: this.currentDate,
         },
       });
     }

@@ -1,3 +1,3 @@
 export function currentDate() {
-  return new Date(Date.now());
+  return new Date(new Date());
 }
