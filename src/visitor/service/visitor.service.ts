@@ -55,9 +55,6 @@ export class VisitorService {
 
     const { page, limit, skip } = paginate(query.page, query.limit);
 
-    console.log(query);
-    console.log(user);
-
     const where = {
       guest: { equals: guest },
       visitor: {
@@ -377,7 +374,8 @@ export class VisitorService {
         visitId,
         AND: {
           dateCreated: {
-            equals: this.currentDate,
+            gte: this.currentDate,
+            lte: this.currentDate,
           },
         },
       },

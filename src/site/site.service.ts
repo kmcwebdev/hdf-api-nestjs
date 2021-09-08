@@ -45,6 +45,7 @@ export class SiteService {
 
     floors.forEach(
       async (data: { floorID: number; name: string; buildingID: number }) => {
+        console.log(data);
         await this.prismaClientService.floor.upsert({
           create: {
             floorId: data.floorID,
