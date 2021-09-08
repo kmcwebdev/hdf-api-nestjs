@@ -19,7 +19,6 @@ import { PrismaClientModule } from './prisma-client/prisma-client.module';
 import { QuestionModule } from './question/question.module';
 import { SiteModule } from './site/site.module';
 import { UserModule } from './user/user.module';
-import { VisitEventGatewayModule } from './visit-event-gateway/visit-event-gateway.module';
 import { VisitorModule } from './visitor/visitor.module';
 
 @Module({
@@ -53,7 +52,6 @@ import { VisitorModule } from './visitor/visitor.module';
     FileModule,
     MiscModule,
     MailModule,
-    VisitEventGatewayModule,
     FilterConfigModule,
   ],
 })
