@@ -295,7 +295,7 @@ export class UserService {
 
     const checkDuplication = await this.checkExternalUserDuplication(email);
 
-    if (Object.keys(checkDuplication || {}).length) {
+    if (checkDuplication) {
       return checkDuplication;
     }
 
