@@ -47,6 +47,7 @@ model UserSiteFilter {
 model UserDomainFilter {
   id      Int      @id @default(autoincrement())
   domains String[]
+  entity  String   @default("n/a")
   userId  Int?     @unique
   user    User?    @relation(fields: [userId], references: [id])
 }
