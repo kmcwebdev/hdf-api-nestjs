@@ -55,12 +55,20 @@ export class VisitorService {
 
     const { page, limit, skip } = paginate(query.page, query.limit);
 
+    const entity = await this.prismaClientService.userDomainFilter.findFirst({
+      where: { userId: user.id },
+    });
+
     const where = {
       guest: { equals: guest },
       visitor: {
         firstName: { contains: firstName, mode: 'insensitive' },
         lastName: { contains: lastName, mode: 'insensitive' },
-        email: { equals: email, mode: 'insensitive' },
+        email: {
+          contains: email,
+          endsWith: (entity?.domains.length && entity.domains[0]) || undefined,
+          mode: 'insensitive',
+        },
       },
       siteId: { equals: siteId },
       healthTag: { tag: { equals: tag } },
