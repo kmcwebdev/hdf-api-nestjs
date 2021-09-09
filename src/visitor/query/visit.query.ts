@@ -39,7 +39,7 @@ export class PTVisitQuery extends PartialType(PaginationQuery) {
   @IsOptional()
   @IsInt()
   @Type(() => Number)
-  readonly siteId: number;
+  siteId: number;
 
   @ApiProperty({ required: false })
   @IsOptional()

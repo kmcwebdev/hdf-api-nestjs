@@ -14,6 +14,9 @@ export class FilterConfigService {
             siteId: true,
             siteName: true,
           },
+          orderBy: {
+            siteId: 'asc',
+          },
         },
       },
     });

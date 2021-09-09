@@ -59,6 +59,11 @@ export class VisitorService {
       where: { userId: user.id },
     });
 
+    const location = await this.prismaClientService.userSiteFilter.findFirst({
+      where: { userId: user.id },
+      include: { sites: { orderBy: { siteId: 'asc' } } },
+    });
+
     const where = {
       guest: { equals: guest },
       visitor: {
@@ -70,7 +75,9 @@ export class VisitorService {
           mode: 'insensitive',
         },
       },
-      siteId: { equals: siteId },
+      siteId: {
+        equals: location.sites.find((x) => x.siteId === siteId)?.siteId,
+      },
       healthTag: { tag: { equals: tag } },
       visitorStatus: { status: { equals: status } },
       dateCreated: {

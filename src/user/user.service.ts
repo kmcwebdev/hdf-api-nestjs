@@ -279,6 +279,10 @@ export class UserService {
       data: { user: { connect: { id: result.id } } },
     });
 
+    await this.prismaClientService.userDomainFilter.create({
+      data: { user: { connect: { id: result.id } } },
+    });
+
     return result;
   }
 
@@ -329,6 +333,10 @@ export class UserService {
     });
 
     await this.prismaClientService.userSiteFilter.create({
+      data: { user: { connect: { id: result.id } } },
+    });
+
+    await this.prismaClientService.userDomainFilter.create({
       data: { user: { connect: { id: result.id } } },
     });
 
