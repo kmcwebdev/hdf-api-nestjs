@@ -3,10 +3,9 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-// "fullTextSearch"
 generator client {
   provider        = "prisma-client-js"
-  previewFeatures = ["interactiveTransactions"]
+  previewFeatures = ["interactiveTransactions", "fullTextSearch"]
 }
 
 model User {
