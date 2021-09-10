@@ -103,11 +103,41 @@ export class VisitorService {
               email: true,
               phoneNumber: true,
               company: true,
+              address: true,
+            },
+          },
+          site: {
+            select: {
+              siteName: true,
+            },
+          },
+          floor: {
+            select: {
+              floor: true,
+            },
+          },
+          workType: {
+            select: {
+              type: true,
             },
           },
           healthTag: {
             select: {
               tag: true,
+            },
+          },
+          travelLocations: true,
+          surveys: {
+            select: {
+              question: {
+                select: {
+                  question: true,
+                },
+              },
+              answers: true,
+            },
+            orderBy: {
+              id: 'asc',
             },
           },
           visitorStatus: {
