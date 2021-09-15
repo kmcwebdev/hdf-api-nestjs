@@ -76,7 +76,9 @@ export class VisitorService {
         },
       },
       siteId: {
-        equals: location.sites.find((x) => x.siteId === siteId)?.siteId,
+        equals:
+          location.sites.find((x) => x.siteId === siteId)?.siteId ||
+          location.sites[0].siteId,
       },
       healthTag: { tag: { equals: tag } },
       visitorStatus: { status: { equals: status } },
