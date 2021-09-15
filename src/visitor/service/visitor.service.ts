@@ -84,7 +84,7 @@ export class VisitorService {
             ? sid
               ? sid
               : undefined
-            : location.sites.length
+            : location.sites.length && !sid
             ? location.sites[0].siteId
             : sid,
       },
