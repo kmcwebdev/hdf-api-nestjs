@@ -10,6 +10,7 @@ import { paginate } from 'src/common/utils/paginate.util';
 import { MailService } from 'src/mail/mail.service';
 import { PrismaClientService } from 'src/prisma-client/prisma-client.service';
 import { User } from 'src/user/entity/user.entity';
+import { UserType } from 'src/user/enum/user-type.enum';
 import { CreateSubEmailsDTO } from 'src/visitor/dto/visitor/create-sub-emails.dto';
 import { CreateVisitorDTO } from 'src/visitor/dto/visitor/create-visitor.dto';
 import { QuestionDTO } from '../dto/visitor/question.dto';
@@ -64,6 +65,8 @@ export class VisitorService {
       include: { sites: { orderBy: { siteId: 'asc' } } },
     });
 
+    const sid = location.sites.find((x) => x.siteId === siteId)?.siteId;
+
     const where = {
       guest: { equals: guest },
       visitor: {
@@ -77,8 +80,13 @@ export class VisitorService {
       },
       siteId: {
         equals:
-          location.sites.find((x) => x.siteId === siteId)?.siteId ||
-          location.sites[0].siteId,
+          user.userType === UserType.Internal
+            ? sid
+              ? sid
+              : undefined
+            : location.sites.length
+            ? location.sites[0].siteId
+            : sid,
       },
       healthTag: { tag: { equals: tag } },
       visitorStatus: { status: { equals: status } },
