@@ -45,14 +45,14 @@ export class AuthController {
 
     res.cookie('accessToken', token, cookie());
 
-    res.send({
+    return {
       id: user.id,
       email: user.email,
       userType: user.userType,
       isLocked: user.isLocked,
       permissions: user.permissions,
       token,
-    });
+    };
   }
 
   @Post('logout')
