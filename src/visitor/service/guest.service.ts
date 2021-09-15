@@ -152,6 +152,7 @@ export class GuestService {
       select: {
         id: true,
         guest: true,
+        visitId: true,
         visitor: {
           select: {
             id: true,
@@ -227,7 +228,7 @@ export class GuestService {
           floor,
           status: guestNeedsAttention ? 'Needs attention' : 'Clear',
           purposeOfVisit,
-          link: 'https://hdf.kmc.solutions',
+          link: `https://health-declaration.kmc.solutions/pdf-result?visitId=${guestVisit.visitId}`,
         },
         groupId: 15220,
         groupsToDisplay: [15220],
