@@ -61,7 +61,7 @@ export class AuthController {
   signOut(@Res() res: Response) {
     res.clearCookie('accessToken');
 
-    res.send({ message: 'sign out Successfully!' });
+    return { message: 'sign out Successfully!' };
   }
 
   @Get('login-state')
