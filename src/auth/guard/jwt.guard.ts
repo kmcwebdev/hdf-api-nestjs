@@ -34,7 +34,7 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
     if (err || info || !user) {
       if (info?.name === 'TokenExpiredError') {
         throw new UnprocessableEntityException(
-          'The session has expired. Please relogin',
+          'The session has expired. Please re-login',
         );
       }
 
